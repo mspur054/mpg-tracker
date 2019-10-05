@@ -1,0 +1,36 @@
+html {
+  font-family: sans-serif;
+}
+
+body {
+  padding: 0;
+  align-content: center;
+  justify-content: center;
+}
+
+h1 {
+  text-align: center;
+  margin: 0;
+}
+
+button {
+  background-color: lightgray;
+  color: darkgray;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+form {
+  border: 3px solid lightgray;
+  display: grid;
+  align-content: center;
+  justify-content: center;
+}
