@@ -1,5 +1,5 @@
 //import { app, apps } from "firebase/app";
-import firebase from "firebase/app";
+import app from "firebase/app";
 import "firebase/auth";
 
 const config = {
@@ -13,18 +13,18 @@ const config = {
 
 class Firebase {
   constructor() {
-    if (!firebase.apps.length) {
-      firebase.initializeApp(config);
+    //if (!firebase.apps.length) {
+    app.initializeApp(config);
 
-      this.auth = firebase.auth();
-    }
+    this.auth = app.auth();
+    // }
   }
 
   doCreateUserWithEmailAndPassword = (email, password) =>
-    this.auth.doCreateUserWithEmailAndPassword(email, password);
+    this.auth.createUserWithEmailAndPassword(email, password);
 
   doSignInWithEmailAndPassword = (email, password) =>
-    this.auth.doSignInWithEmailAndPassword(email, password);
+    this.auth.signInWithEmailAndPassword(email, password);
 
   doSignOut = () => this.auth.doSignOut();
 
