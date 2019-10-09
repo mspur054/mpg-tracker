@@ -1,6 +1,7 @@
 //import { app, apps } from "firebase/app";
 import app from "firebase/app";
 import "firebase/auth";
+import "firebase/database";
 
 const config = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -17,8 +18,11 @@ class Firebase {
     app.initializeApp(config);
 
     this.auth = app.auth();
+    this.db = app.database();
     // }
   }
+
+  // AUTH
 
   doCreateUserWithEmailAndPassword = (email, password) =>
     this.auth.createUserWithEmailAndPassword(email, password);
@@ -31,6 +35,36 @@ class Firebase {
   doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
 
   doPasswordUpdate = password => this.auth.currentUser.updatePassword(password);
+
+  // USER
+
+  user = uid => this.db.ref(`users/${uid}`);
+
+  users = () => this.db.ref("users");
+
+  // CARS
+
+  car = carId => this.db.ref(`cars/${carId}`);
+
+  cars = userId =>
+    this.db
+      .ref(`cars`)
+      .orderByChild("userId")
+      .equalTo(userId);
+
+  doCreateCar = (userId, name, year) => {
+    const newCarKey = this.db
+      .ref()
+      .child("cars")
+      .push().key;
+
+    return this.db.ref(`cars/${newCarKey}`).set({
+      userId: userId,
+      carname: name,
+      year: year,
+      dateAdded: Date.now()
+    });
+  };
 }
 
 //export default !firebase.apps.length ? firebase.initializeApp(config) : firebase.app();
