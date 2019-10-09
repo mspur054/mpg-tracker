@@ -17,6 +17,8 @@ class Firebase {
     //if (!firebase.apps.length) {
     app.initializeApp(config);
 
+    this.serverValue = app.database.ServerValue;
+
     this.auth = app.auth();
     this.db = app.database();
     // }
@@ -46,11 +48,13 @@ class Firebase {
 
   car = carId => this.db.ref(`cars/${carId}`);
 
-  cars = userId =>
+  getUsercars = userId =>
     this.db
       .ref(`cars`)
       .orderByChild("userId")
       .equalTo(userId);
+
+  cars = () => this.db.ref(`cars`);
 
   doCreateCar = (userId, name, year) => {
     const newCarKey = this.db
@@ -62,7 +66,7 @@ class Firebase {
       userId: userId,
       carname: name,
       year: year,
-      dateAdded: Date.now()
+      dateAdded: this.serverValue.TIMESTAMP
     });
   };
 }
