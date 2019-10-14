@@ -59,11 +59,10 @@ class CarPageFormBase extends React.Component {
   }
 
   onEditCar = (car, updatedCar) => {
-    const { uid, ...carSnapshot } = car;
+    const { uid, ...carSnapshot } = updatedCar;
 
     this.props.firebase.car(car.uid).set({
       ...carSnapshot,
-      updatedCar,
       editedAt: this.props.firebase.serverValue.TIMESTAMP
     });
   };
@@ -109,7 +108,7 @@ class CarPageFormBase extends React.Component {
               />
             )}
             {!cars && <div>There are no cars...</div>}
-
+            <h2>Add a Car</h2>
             <form onSubmit={event => this.onSubmit(event, authUser)}>
               <input
                 name="carname"

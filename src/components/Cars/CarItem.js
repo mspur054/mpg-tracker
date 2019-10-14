@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const INITIAL_STATE = {
   editMode: false,
@@ -10,6 +10,10 @@ const CarItem = ({ car, ...props }) => {
   const { editMode } = state;
   const { authUser, onDeleteCar } = props;
 
+  useEffect(() => {
+    setState({ car: car });
+  }, [car]);
+
   const onToggleEditMode = () => {
     setState(state => ({
       editMode: !state.editMode,
@@ -18,13 +22,20 @@ const CarItem = ({ car, ...props }) => {
   };
 
   const onEditCarFields = event => {
-    setState({ car: { [event.target.name]: event.target.value } });
+    event.persist();
+    const fieldName = event.target.name;
+    const fieldValue = event.target.value;
+
+    setState(prevState => ({
+      editMode: prevState.editMode,
+      car: { ...prevState.car, [fieldName]: fieldValue }
+    }));
   };
 
   const onSaveCarEdits = () => {
     props.onEditCar(car, state.car);
 
-    setState({ editMode: false });
+    setState(prevState => ({ ...prevState, editMode: false }));
   };
 
   return (
@@ -33,20 +44,20 @@ const CarItem = ({ car, ...props }) => {
         <>
           <input
             name="carname"
-            value={car.carname}
+            value={state.car.carname}
             onChange={onEditCarFields}
             type="text"
           />
           <input
             name="year"
-            value={car.year}
+            value={state.car.year}
             onChange={onEditCarFields}
             type="text"
           />
         </>
       ) : (
         <span>
-          <strong>{car.carname}</strong> - {car.year}
+          <strong>{state.car.carname}</strong> - {car.year}
           {car.editedAt && <span>(Edited)</span>}
         </span>
       )}
