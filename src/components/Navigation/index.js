@@ -25,6 +25,12 @@ const NavigatonAuth = () => (
       <Link to={ROUTES.ACCOUNT}>Account</Link>
     </li>
     <li>
+      <Link to={ROUTES.ADMIN}>Admin</Link>
+    </li>
+    <li>
+      <Link to={ROUTES.CARS}>Cars</Link>
+    </li>
+    <li>
       <SignOutButton />
     </li>
   </ul>
