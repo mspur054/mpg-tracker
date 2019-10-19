@@ -14,14 +14,12 @@ const config = {
 
 class Firebase {
   constructor() {
-    //if (!firebase.apps.length) {
     app.initializeApp(config);
 
     this.serverValue = app.database.ServerValue;
 
     this.auth = app.auth();
     this.db = app.database();
-    // }
   }
 
   // AUTH
@@ -67,6 +65,42 @@ class Firebase {
       carname: name,
       year: year,
       dateAdded: this.serverValue.TIMESTAMP
+    });
+  };
+
+  //MPG tracking
+
+  gasEntry = uid => this.db.ref(`gasEntries/${uid}`);
+
+  getCarGasEntries = carId => {
+    this.db
+      .ref(`gasEntries`)
+      .orderByChild("carId")
+      .equalTo(carId);
+  };
+
+  getUserGasEntries = userId => {
+    this.db
+      .ref(`gasEntries`)
+      .orderByChild("userId")
+      .equalTo(userId);
+  };
+
+  doCreateGasEntry = (userId, carId, mileage, liters, entryDate, cost) => {
+    const newGasKey = this.db
+      .ref()
+      .child("gasEntries")
+      .push().key;
+
+    return this.db.ref(`gasEntries/${newGasKey}`).set({
+      userId: userId,
+      carId: carId,
+      mileage: mileage,
+      liters: liters,
+      entryDate: entryDate,
+      cost: cost,
+      dateAdded: this.serverValue.TIMESTAMP,
+      units: 1 //KM and Liters
     });
   };
 }
