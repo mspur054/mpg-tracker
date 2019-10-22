@@ -10,6 +10,7 @@ import HomePage from "../Home";
 import AccountPage from "../Account";
 import AdminPage from "../Admin";
 import CarPage from "../Cars";
+import Burger from "../Burger";
 
 //TEMPORARY
 import TrackingFormBase from "../Track";
@@ -22,15 +23,21 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      authUser: null
+      authUser: null,
+      open: false
     };
   }
+
+  changeOpen = () => {
+    this.setState(prevState => ({ open: !prevState.open }));
+  };
 
   render() {
     return (
       <Router>
         <div>
-          <Navigation />
+          <Burger open={this.state.open} changeOpen={this.changeOpen} />
+          <Navigation open={this.state.open} />
           <hr />
           <Route exact path={ROUTES.LANDING} component={LandingPage} />
           <Route path={ROUTES.SIGN_UP} component={SignUpPage} />

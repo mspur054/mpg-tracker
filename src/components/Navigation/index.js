@@ -5,30 +5,47 @@ import SignOutButton from "../SignOut";
 import * as ROUTES from "../../constants/routes";
 import { AuthUserContext } from "../Session";
 
-const Navigation = () => (
-  <div>
-    <AuthUserContext.Consumer>
-      {authUser => (authUser ? <NavigatonAuth /> : <NavigationNonAuth />)}
-    </AuthUserContext.Consumer>
-  </div>
-);
+import { StyledMenu } from "./Navigation.styled";
+
+const Navigation = ({ open }) => {
+  return (
+    <StyledMenu open={open}>
+      <Link to={ROUTES.HOME} className="logo">
+        {open ? "works" : "logo"}
+      </Link>
+      <AuthUserContext.Consumer>
+        {authUser => (authUser ? <NavigatonAuth /> : <NavigationNonAuth />)}
+      </AuthUserContext.Consumer>
+    </StyledMenu>
+  );
+};
 
 const NavigatonAuth = () => (
-  <ul>
+  <ul className="main-nav">
     <li>
-      <Link to={ROUTES.LANDING}>Landing</Link>
+      <Link className="nav-links" to={ROUTES.LANDING}>
+        Landing
+      </Link>
     </li>
     <li>
-      <Link to={ROUTES.HOME}>Home</Link>
+      <Link className="nav-links" to={ROUTES.HOME}>
+        Home
+      </Link>
     </li>
     <li>
-      <Link to={ROUTES.ACCOUNT}>Account</Link>
+      <Link className="nav-links" to={ROUTES.ACCOUNT}>
+        Account
+      </Link>
     </li>
     <li>
-      <Link to={ROUTES.ADMIN}>Admin</Link>
+      <Link className="nav-links" to={ROUTES.ADMIN}>
+        Admin
+      </Link>
     </li>
     <li>
-      <Link to={ROUTES.CARS}>Cars</Link>
+      <Link className="nav-links" to={ROUTES.CARS}>
+        Cars
+      </Link>
     </li>
     <li>
       <SignOutButton />
