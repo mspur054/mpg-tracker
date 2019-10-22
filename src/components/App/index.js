@@ -21,11 +21,31 @@ import { withAuthentication } from "../Session/";
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.setWrapperRef = this.setWrapperRef.bind(this);
+    this.handleClickOutside = this.handleClickOutside.bind(this);
 
     this.state = {
       authUser: null,
       open: false
     };
+  }
+
+  componentDidMount() {
+    document.addEventListener("mousedown", this.handleClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.handleClickOutside);
+  }
+
+  setWrapperRef(node) {
+    this.wrapperRef = node;
+  }
+
+  handleClickOutside(event) {
+    if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+      this.setState({ open: false });
+    }
   }
 
   changeOpen = () => {
@@ -35,9 +55,11 @@ class App extends React.Component {
   render() {
     return (
       <Router>
-        <div>
+        <div ref={this.setWrapperRef}>
           <Burger open={this.state.open} changeOpen={this.changeOpen} />
           <Navigation open={this.state.open} />
+        </div>
+        <div>
           <hr />
           <Route exact path={ROUTES.LANDING} component={LandingPage} />
           <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
