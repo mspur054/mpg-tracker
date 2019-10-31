@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { defaultProps } from "recompose";
+import React, { useState } from "react";
+
+import { StyledDropDown } from "./DropDown.styled";
 
 const INITIAL_STATE = {
   showMenu: false
@@ -25,19 +26,24 @@ const DropDown = ({ cars, ...props }) => {
   };
 
   return (
-    <div>
+    <StyledDropDown>
       <button onClick={handleClick}>Select a car</button>
 
       {state.showMenu ? (
-        <div className="menu">
+        <div className="dd-list">
           {cars.map(car => (
-            <button onClick={doChangeSelectedCar} key={car.uid} value={car.uid}>
+            <button
+              className="dd-list-item"
+              onClick={doChangeSelectedCar}
+              key={car.uid}
+              value={car.uid}
+            >
               {car.carname}
             </button>
           ))}
         </div>
       ) : null}
-    </div>
+    </StyledDropDown>
   );
 };
 

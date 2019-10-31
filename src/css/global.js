@@ -34,6 +34,14 @@ export const GlobalStyles = createGlobalStyle`
   small {
     display: block;
   }
+  button{
+    background-color: lightcoral; 
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    text-align: center;
+    text-decoration: none;
+  }
   a {
     color: ${({ theme }) => theme.primaryHover};
     text-decoration: none;

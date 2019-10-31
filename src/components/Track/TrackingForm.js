@@ -5,7 +5,9 @@ import { withRouter } from "react-router-dom";
 
 import { AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
-import DropDown from "../DropDown";
+//import DropDown from "../DropDown";
+import DropDown from "react-dropdown";
+import { StyledTrackingForm } from "./TrackingForm.styled";
 
 import * as ROUTES from "../../constants/routes";
 import "react-datepicker/dist/react-datepicker.css";
@@ -18,8 +20,8 @@ const INITIAL_STATE = {
   cost: "",
   entryDate: new Date(),
   loading: false,
-  error: null,
-  cars: []
+  cars: [],
+  ddCars: []
 };
 
 class TrackingFormBase extends React.Component {
@@ -37,7 +39,6 @@ class TrackingFormBase extends React.Component {
         console.log("no user");
       }
     });
-    //this.onGetCars();
   }
 
   onGetCars = () => {
@@ -53,9 +54,17 @@ class TrackingFormBase extends React.Component {
             ...carObject[key],
             uid: key
           }));
-          this.setState({ cars: carList, loading: false });
+          const ddList = [];
+          carList.forEach((car, i) => {
+            ddList[i] = {
+              value: car.uid,
+              label: car.carname
+            };
+          });
+
+          this.setState({ cars: carList, loading: false, ddCars: ddList });
         } else {
-          this.setState({ cars: null, loading: false });
+          this.setState({ cars: null, loading: false, ddCars: null });
         }
       });
   };
@@ -93,7 +102,7 @@ class TrackingFormBase extends React.Component {
       liters,
       entryDate,
       error,
-      cars,
+      ddCars,
       loading,
       cost
     } = this.state;
@@ -102,41 +111,60 @@ class TrackingFormBase extends React.Component {
     return (
       <AuthUserContext.Consumer>
         {authUser => (
-          <form onSubmit={event => this.onSubmit(event, authUser)}>
-            {loading && <div>Loading...</div>}
-            <DropDown cars={cars} onSelectCar={this.onSelectCar}></DropDown>
-            <input
-              name="mileage"
-              value={mileage}
-              onChange={this.onChange}
-              type="text"
-              placeholder="Distance travelled"
-            />
-            <input
-              name="liters"
-              value={liters}
-              onChange={this.onChange}
-              type="text"
-              placeholder="Gas consumed"
-            />
-            <input
-              name="cost"
-              value={cost}
-              onChange={this.onChange}
-              type="text"
-              placeholder="Cost of refill"
-            />
-            <DatePicker
-              name="entryDate"
-              selected={entryDate}
-              maxDate={new Date()}
-              onChange={date => this.setState({ entryDate: date })}
-            ></DatePicker>
-            <button disabled={isInvalid} type="submit">
-              Add Entry
-            </button>
-            {error && <p>{error.message}</p>}
-          </form>
+          <>
+            <h1>Add an Entry</h1>
+            <form onSubmit={event => this.onSubmit(event, authUser)}>
+              <StyledTrackingForm>
+                {loading && <div>Loading...</div>}
+                <DropDown options={ddCars}></DropDown>
+                <li>
+                  <label for="mileage">Mileage</label>
+                  <input
+                    name="mileage"
+                    value={mileage}
+                    onChange={this.onChange}
+                    type="text"
+                    placeholder="Distance travelled"
+                  />
+                </li>
+                <li>
+                  <label for="liters">Gas Consumed</label>
+                  <input
+                    name="liters"
+                    value={liters}
+                    onChange={this.onChange}
+                    type="text"
+                    placeholder="Gas consumed"
+                  />
+                </li>
+                <li>
+                  <label for="cost">Cost</label>
+                  <input
+                    name="cost"
+                    value={cost}
+                    onChange={this.onChange}
+                    type="text"
+                    placeholder="Cost of refill"
+                  />
+                </li>
+                <li>
+                  <label for="entryDate">Date of Refill</label>
+                  <DatePicker
+                    name="entryDate"
+                    selected={entryDate}
+                    maxDate={new Date()}
+                    onChange={date => this.setState({ entryDate: date })}
+                  ></DatePicker>
+                </li>
+                <li>
+                  <button disabled={isInvalid} type="submit">
+                    Add Entry
+                  </button>
+                </li>
+                {error && <p>{error.message}</p>}
+              </StyledTrackingForm>
+            </form>
+          </>
         )}
       </AuthUserContext.Consumer>
     );

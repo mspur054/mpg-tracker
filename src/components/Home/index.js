@@ -42,9 +42,6 @@ const HomePage = ({ firebase }) => {
 
   useEffect(() => {
     setState({ loading: true });
-    // firebase
-    // .getUsercars(firebase.auth().currentUser.uid)
-    //firebase.cars()
     firebase
       .getUsercars(firebase.auth.currentUser.uid)
       .on("value", snapshot => {
