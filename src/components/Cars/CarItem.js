@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+import { StyledCarItem } from "./CarItem.styled";
+
 const INITIAL_STATE = {
   editMode: false,
   car: {}
@@ -40,37 +42,36 @@ const CarItem = ({ car, ...props }) => {
 
   return (
     <li>
-      {editMode ? (
-        <>
-          <input
-            name="carname"
-            value={state.car.carname}
-            onChange={onEditCarFields}
-            type="text"
-          />
-          <input
-            name="year"
-            value={state.car.year}
-            onChange={onEditCarFields}
-            type="text"
-          />
-        </>
-      ) : (
-        <span>
-          <strong>{state.car.carname}</strong> - {car.year}
-          {car.editedAt && <span>(Edited)</span>}
-        </span>
-      )}
-
       {authUser.uid === car.userId && (
-        <span>
+        <StyledCarItem>
           {editMode ? (
-            <span>
-              <button onClick={onSaveCarEdits}>Save</button>
-              <button onClick={onToggleEditMode}>Reset</button>
-            </span>
+            <>
+              <input
+                name="carname"
+                value={state.car.carname}
+                onChange={onEditCarFields}
+                type="text"
+              />
+              <input
+                name="year"
+                value={state.car.year}
+                onChange={onEditCarFields}
+                type="text"
+              />
+
+              <span>
+                <button onClick={onSaveCarEdits}>Save</button>
+                <button onClick={onToggleEditMode}>Reset</button>
+              </span>
+            </>
           ) : (
-            <button onClick={onToggleEditMode}>Edit</button>
+            <>
+              <span>
+                <strong>{state.car.carname}</strong> - {car.year}
+                {car.editedAt && <span>(Edited)</span>}
+              </span>
+              <button onClick={onToggleEditMode}>Edit</button>
+            </>
           )}
 
           {!editMode && (
@@ -78,7 +79,7 @@ const CarItem = ({ car, ...props }) => {
               Delete
             </button>
           )}
-        </span>
+        </StyledCarItem>
       )}
     </li>
   );
