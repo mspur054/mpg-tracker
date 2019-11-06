@@ -41,6 +41,8 @@ export const GlobalStyles = createGlobalStyle`
     padding: 10px 25px;
     text-align: center;
     text-decoration: none;
+    border-radius: 2px;
+
   }
   a {
     color: ${({ theme }) => theme.primaryHover};

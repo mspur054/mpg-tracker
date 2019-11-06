@@ -5,15 +5,19 @@ import { withRouter } from "react-router-dom";
 
 import { AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
-//import DropDown from "../DropDown";
-import DropDown from "react-dropdown";
-import { StyledTrackingForm } from "./TrackingForm.styled";
+
+import TrackingDropDown from "../TrackingDropDown";
+import {
+  StyledTrackingForm,
+  StyledTrackingFormButton,
+  StyledTrackingFormInput
+} from "./TrackingForm.styled";
 
 import * as ROUTES from "../../constants/routes";
 import "react-datepicker/dist/react-datepicker.css";
 
 const INITIAL_STATE = {
-  carId: null,
+  selectedCar: { label: null, value: null },
   mileage: "",
   liters: "",
   error: null,
@@ -73,15 +77,22 @@ class TrackingFormBase extends React.Component {
     this.props.firebase.cars().off();
   }
 
-  onSelectCar = carId => {
-    this.setState({ carId });
+  onSelectCar = car => {
+    this.setState({ selectedCar: car });
   };
 
   onSubmit = (event, authUser) => {
-    const { carId, mileage, liters, entryDate, cost } = this.state;
+    const { selectedCar, mileage, liters, entryDate, cost } = this.state;
 
     this.props.firebase
-      .doCreateGasEntry(authUser.uid, carId, mileage, liters, entryDate, cost)
+      .doCreateGasEntry(
+        authUser.uid,
+        selectedCar.value,
+        mileage,
+        liters,
+        entryDate,
+        cost
+      )
       .then(() => {
         this.setState({ ...INITIAL_STATE });
         this.props.history.push(ROUTES.HOME);
@@ -104,9 +115,11 @@ class TrackingFormBase extends React.Component {
       error,
       ddCars,
       loading,
-      cost
+      cost,
+      selectedCar
     } = this.state;
     const isInvalid = mileage === "" || liters === "" || entryDate === "";
+    const defaultOption = selectedCar.label;
 
     return (
       <AuthUserContext.Consumer>
@@ -116,10 +129,14 @@ class TrackingFormBase extends React.Component {
             <form onSubmit={event => this.onSubmit(event, authUser)}>
               <StyledTrackingForm>
                 {loading && <div>Loading...</div>}
-                <DropDown options={ddCars}></DropDown>
+                <TrackingDropDown
+                  ddCars={ddCars}
+                  defaultOption={defaultOption}
+                  onChange={this.onSelectCar}
+                ></TrackingDropDown>
                 <li>
                   <label for="mileage">Mileage</label>
-                  <input
+                  <StyledTrackingFormInput
                     name="mileage"
                     value={mileage}
                     onChange={this.onChange}
@@ -157,9 +174,9 @@ class TrackingFormBase extends React.Component {
                   ></DatePicker>
                 </li>
                 <li>
-                  <button disabled={isInvalid} type="submit">
+                  <StyledTrackingFormButton disabled={isInvalid} type="submit">
                     Add Entry
-                  </button>
+                  </StyledTrackingFormButton>
                 </li>
                 {error && <p>{error.message}</p>}
               </StyledTrackingForm>
