@@ -3,35 +3,24 @@ import { compose } from "recompose";
 
 import { withAuthorization, AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
+import { StyledNumEntries } from "./Home.styled";
 
 const INITIAL_STATE = {
-  cars: [],
+  entries: [],
   loading: false,
   error: null
 };
 
-const HomePageBase = ({ loading, cars }) => {
+const HomePageBase = ({ loading, entries }) => {
   return (
     <div>
       <h1>Home Page</h1>
       <p>The home page is accessible to signed in users.</p>
       {loading && <div>Loading...</div>}
-      {cars && <CarList cars={cars} />}
-      {!cars && <div>There are no cars...</div>}
-    </div>
-  );
-};
+      {entries && <StyledNumEntries>{entries.length}</StyledNumEntries>}
 
-const CarList = ({ cars }) => {
-  return (
-    <ul>
-      {cars.map(car => (
-        <li key={car.uid}>
-          <span>{car.carname}</span>
-          <span>{car.year}</span>
-        </li>
-      ))}
-    </ul>
+      {/* {!cars && <div>There are no cars...</div>} */}
+    </div>
   );
 };
 
@@ -39,33 +28,32 @@ const condition = authUser => !!authUser;
 
 const HomePage = ({ firebase }) => {
   const [state, setState] = useState(INITIAL_STATE);
-
+  //.getUserGasEntries(firebase.auth.currentUser.uid)
   useEffect(() => {
     setState({ loading: true });
-    firebase
-      .getUsercars(firebase.auth.currentUser.uid)
-      .on("value", snapshot => {
-        const carObject = snapshot.val();
+    console.log(firebase.auth.currentUser.uid);
+    firebase.gasEntries().on("value", snapshot => {
+      const entriesObject = snapshot.val();
 
-        if (carObject) {
-          const carList = Object.keys(carObject).map(key => ({
-            ...carObject[key],
-            uid: key
-          }));
-          setState({ cars: carList, loading: false });
-        } else {
-          setState({ cars: null, loading: false });
-        }
-      });
+      if (entriesObject) {
+        const entriesList = Object.keys(entriesObject).map(key => ({
+          ...entriesObject[key],
+          uid: key
+        }));
+        setState({ entries: entriesList, loading: false });
+      } else {
+        setState({ entries: null, loading: false });
+      }
+    });
 
     //cleanup
-    return () => firebase.cars().off();
+    return () => firebase.gasEntries().off();
   }, []);
   return (
     <AuthUserContext.Consumer>
       {authUser => (
         <div>
-          <HomePageBase cars={state.cars} loading={state.loading} />
+          <HomePageBase entries={state.entries} loading={state.loading} />
         </div>
       )}
     </AuthUserContext.Consumer>
