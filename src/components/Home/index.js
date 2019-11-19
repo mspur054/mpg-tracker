@@ -76,7 +76,6 @@ const summarizeData = entries => {
       acc[cur.month].hasOwnProperty(prop)
         ? (acc[cur.month][prop] += Number(cur[prop]))
         : (acc[cur.month][prop] = Number(cur[prop]));
-      console.log(prop);
     });
     return acc;
   }, {});
