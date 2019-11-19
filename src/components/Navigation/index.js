@@ -10,9 +10,6 @@ import { StyledMenu } from "./Navigation.styled";
 const Navigation = ({ open }) => {
   return (
     <StyledMenu open={open}>
-      <Link to={ROUTES.HOME} className="logo">
-        {open ? "works" : "logo"}
-      </Link>
       <AuthUserContext.Consumer>
         {authUser => (authUser ? <NavigatonAuth /> : <NavigationNonAuth />)}
       </AuthUserContext.Consumer>

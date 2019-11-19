@@ -72,6 +72,8 @@ class Firebase {
 
   gasEntry = uid => this.db.ref(`gasEntries/${uid}`);
 
+  gasEntries = () => this.db.ref(`gasEntries`);
+
   getCarGasEntries = carId => {
     this.db
       .ref(`gasEntries`)
