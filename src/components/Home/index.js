@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { compose } from "recompose";
-import { VictoryBar } from "victory";
+import { VictoryBar, VictoryChart } from "victory";
 
 import { withAuthorization, AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
@@ -11,17 +11,66 @@ import {
   StyledMPG
 } from "./Home.styled";
 import Card from "../Card";
+import { max } from "date-fns";
 
 const INITIAL_STATE = {
   entries: [],
   loading: false,
   error: null,
   totalSpent: null,
-  avgEfficiency: null
+  avgEfficiency: null,
+  chartData: []
 };
 
-const MpgChart = monthlyData => {
-  return <VictoryBar data={monthlyData} x="month" y="cost" />;
+const CHART_INITIAL_STATE = {
+  //! FIX THIS
+  isLoading: true,
+  chartData: [],
+  yDomain: []
+};
+
+const MpgChart = entries => {
+  const [state, setState] = useState(CHART_INITIAL_STATE);
+
+  const today = new Date();
+  const monthlyDomain = [today.getMonth() - 3, today.getMonth()];
+
+  useEffect(() => {
+    try {
+      const monthlyData = summarizeData(entries);
+
+      setState({
+        isLoading: false,
+        chartData: monthlyData
+      });
+    } catch (e) {
+      console.log(e);
+      setState({ isLoading: false });
+    }
+  }, []);
+  //
+  const yDomain = [0, getUpperYDomain(state.chartData)];
+
+  return state.isLoading ? (
+    <VictoryChart>
+      <VictoryBar />
+    </VictoryChart>
+  ) : (
+    <VictoryChart domain={{ x: monthlyDomain, y: yDomain }}>
+      <VictoryBar data={state.chartData} x="month" y="cost" />
+    </VictoryChart>
+  );
+};
+
+const getUpperYDomain = monthlyData => {
+  const maxVal = Math.max.apply(
+    Math,
+    monthlyData.map(function(o) {
+      return o.cost;
+    })
+  );
+
+  return Math.ceil(maxVal / 100) * 100;
 };
 
 const HomePageBase = ({ loading, entries, totalSpent, avgEfficiency }) => {
@@ -37,10 +86,7 @@ const HomePageBase = ({ loading, entries, totalSpent, avgEfficiency }) => {
             100}`}</StyledSpentOnGas>
           <StyledMPG>{`${Math.round(avgEfficiency * 100) /
             100} l/100 km`}</StyledMPG>
-          <Card
-            header="Monthly AVG Cost"
-            body={MpgChart(summarizeData(entries))}
-          />
+          <Card header="Monthly AVG Cost" body={MpgChart(entries)} />
         </StyledInformationContainer>
       )}
 
@@ -91,7 +137,7 @@ const summarizeData = entries => {
   }, {});
 
   const graphData = Object.entries(monthlyData).map(e => ({
-    month: e[0],
+    month: parseInt(e[0], 10),
     ...e[1]
   }));
 
@@ -99,7 +145,7 @@ const summarizeData = entries => {
 
   //Object.entries(temp1).map(e => ({month:e[0], Object.entries(e[1]).map(b => ({[b[0]]:b[1]}))}))
 
-  console.log(graphData);
+  console.log("graphdata", graphData);
 
   return graphData;
 };
@@ -120,7 +166,6 @@ const HomePage = ({ firebase }) => {
         }));
         const avgEfficiency = avgMPG(entriesList);
         const total = totalSpent(entriesList);
-        const mpgbymonth = summarizeData(entriesList);
         setState({
           entries: entriesList,
           loading: false,
