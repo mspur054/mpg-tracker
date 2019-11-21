@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { compose } from "recompose";
+import { VictoryBar } from "victory";
 
 import { withAuthorization, AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
@@ -9,6 +10,7 @@ import {
   StyledSpentOnGas,
   StyledMPG
 } from "./Home.styled";
+import Card from "../Card";
 
 const INITIAL_STATE = {
   entries: [],
@@ -16,6 +18,10 @@ const INITIAL_STATE = {
   error: null,
   totalSpent: null,
   avgEfficiency: null
+};
+
+const MpgChart = monthlyData => {
+  return <VictoryBar data={monthlyData} x="month" y="cost" />;
 };
 
 const HomePageBase = ({ loading, entries, totalSpent, avgEfficiency }) => {
@@ -31,6 +37,10 @@ const HomePageBase = ({ loading, entries, totalSpent, avgEfficiency }) => {
             100}`}</StyledSpentOnGas>
           <StyledMPG>{`${Math.round(avgEfficiency * 100) /
             100} l/100 km`}</StyledMPG>
+          <Card
+            header="Monthly AVG Cost"
+            body={MpgChart(summarizeData(entries))}
+          />
         </StyledInformationContainer>
       )}
 
@@ -60,10 +70,10 @@ const avgMPG = entries => {
 const summarizeData = entries => {
   //might bnot be necessary
   entries.forEach(e => (e.month = new Date(e.dateAdded).getMonth()));
-  console.log(entries);
 
   //Fields to summarize
   const keys = ["cost", "liters", "mileage"];
+
   const monthlyData = entries.reduce((acc, cur) => {
     //keep count of records for averaging
     if (acc.hasOwnProperty(cur.month) === false) {
@@ -80,7 +90,18 @@ const summarizeData = entries => {
     return acc;
   }, {});
 
-  return monthlyData;
+  const graphData = Object.entries(monthlyData).map(e => ({
+    month: e[0],
+    ...e[1]
+  }));
+
+  // Object.entries(temp1).map(e => {month: e[0], Object.entries(temp2).map(e => ({[e[0]]:e[1]}))
+
+  //Object.entries(temp1).map(e => ({month:e[0], Object.entries(e[1]).map(b => ({[b[0]]:b[1]}))}))
+
+  console.log(graphData);
+
+  return graphData;
 };
 
 const HomePage = ({ firebase }) => {
