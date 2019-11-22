@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { compose } from "recompose";
-import { VictoryBar, VictoryChart } from "victory";
+import { VictoryBar, VictoryChart, VictoryAxis, VictoryLine } from "victory";
+import { numberRange } from "../../helper/helper";
 
 import { withAuthorization, AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
@@ -11,7 +12,6 @@ import {
   StyledMPG
 } from "./Home.styled";
 import Card from "../Card";
-import { max } from "date-fns";
 
 const INITIAL_STATE = {
   entries: [],
@@ -25,15 +25,14 @@ const INITIAL_STATE = {
 const CHART_INITIAL_STATE = {
   //! FIX THIS
   isLoading: true,
-  chartData: [],
-  yDomain: []
+  chartData: []
 };
 
 const MpgChart = entries => {
   const [state, setState] = useState(CHART_INITIAL_STATE);
 
   const today = new Date();
-  const monthlyDomain = [today.getMonth() - 3, today.getMonth()];
+  const monthlyDomain = [today.getMonth() - 2, today.getMonth() + 1];
 
   useEffect(() => {
     try {
@@ -47,7 +46,7 @@ const MpgChart = entries => {
       console.log(e);
       setState({ isLoading: false });
     }
-  }, []);
+  }, [entries]);
   //
   const yDomain = [0, getUpperYDomain(state.chartData)];
 
@@ -56,8 +55,15 @@ const MpgChart = entries => {
       <VictoryBar />
     </VictoryChart>
   ) : (
-    <VictoryChart domain={{ x: monthlyDomain, y: yDomain }}>
-      <VictoryBar data={state.chartData} x="month" y="cost" />
+    <VictoryChart>
+      <VictoryLine data={state.chartData} x="month" y="cost" />
+      <VictoryAxis
+        crossAxis
+        tickFormat={t => `${Math.round(t)}`}
+        tickCount={monthlyDomain[1] - monthlyDomain[0]}
+        domain={{ x: monthlyDomain }}
+      />
+      <VictoryAxis dependentAxis domain={{ y: yDomain }} />
     </VictoryChart>
   );
 };
@@ -115,7 +121,7 @@ const avgMPG = entries => {
 
 const summarizeData = entries => {
   //might bnot be necessary
-  entries.forEach(e => (e.month = new Date(e.dateAdded).getMonth()));
+  entries.forEach(e => (e.month = new Date(e.dateAdded).getMonth() + 1));
 
   //Fields to summarize
   const keys = ["cost", "liters", "mileage"];
