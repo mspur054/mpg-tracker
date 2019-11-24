@@ -140,7 +140,7 @@ class TrackingFormBase extends React.Component {
                     name="mileage"
                     value={mileage}
                     onChange={this.onChange}
-                    type="text"
+                    type="number"
                     placeholder="Distance travelled"
                   />
                 </li>
@@ -160,7 +160,7 @@ class TrackingFormBase extends React.Component {
                     name="cost"
                     value={cost}
                     onChange={this.onChange}
-                    type="text"
+                    type="number"
                     placeholder="Cost of refill"
                   />
                 </li>
@@ -188,7 +188,4 @@ class TrackingFormBase extends React.Component {
   }
 }
 
-export default compose(
-  withFirebase,
-  withRouter
-)(TrackingFormBase);
+export default compose(withFirebase, withRouter)(TrackingFormBase);
