@@ -20,11 +20,6 @@ const Navigation = ({ open }) => {
 const NavigatonAuth = () => (
   <ul className="main-nav">
     <li>
-      <Link className="nav-links" to={ROUTES.LANDING}>
-        Landing
-      </Link>
-    </li>
-    <li>
       <Link className="nav-links" to={ROUTES.HOME}>
         Home
       </Link>
@@ -42,6 +37,11 @@ const NavigatonAuth = () => (
     <li>
       <Link className="nav-links" to={ROUTES.CARS}>
         Cars
+      </Link>
+    </li>
+    <li>
+      <Link className="nav-links" to={ROUTES.DATA_ENTRY}>
+        Entries
       </Link>
     </li>
     <li>
