@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { compose } from "recompose";
-import { VictoryBar, VictoryChart, VictoryAxis, VictoryLine } from "victory";
-import { numberRange } from "../../helper/helper";
+import {
+  VictoryChart,
+  VictoryAxis,
+  VictoryLine,
+  VictoryTooltip
+} from "victory";
 
 import { withAuthorization, AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
@@ -52,11 +56,19 @@ const MpgChart = entries => {
 
   return state.isLoading ? (
     <VictoryChart>
-      <VictoryBar />
+      <VictoryLine />
     </VictoryChart>
   ) : (
     <VictoryChart>
-      <VictoryLine data={state.chartData} x="month" y="cost" />
+      <VictoryLine
+        labels={({ datum }) => Math.round(datum.cost)}
+        data={state.chartData}
+        x="month"
+        y="cost"
+        // labelComponent={
+        //   <VictoryTooltip cornerRadius={2} dy={0} centerOffset={{ x: 25 }} />
+        // }
+      />
       <VictoryAxis
         crossAxis
         tickFormat={t => `${Math.round(t)}`}
