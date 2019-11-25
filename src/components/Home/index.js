@@ -59,7 +59,7 @@ const MpgChart = entries => {
       <VictoryLine />
     </VictoryChart>
   ) : (
-    <VictoryChart>
+    <VictoryChart style={{ parent: { maxWidth: "100%" } }}>
       <VictoryLine
         labels={({ datum }) => Math.round(datum.cost)}
         data={state.chartData}
