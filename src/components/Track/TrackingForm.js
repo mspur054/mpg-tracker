@@ -142,11 +142,14 @@ class TrackingFormBase extends React.Component {
                     onChange={this.onChange}
                     type="number"
                     placeholder="Distance travelled"
+                    min="0"
+                    required
                   />
                 </li>
                 <li>
                   <label for="liters">Gas Consumed</label>
                   <input
+                    required
                     name="liters"
                     value={liters}
                     onChange={this.onChange}
@@ -162,6 +165,7 @@ class TrackingFormBase extends React.Component {
                     onChange={this.onChange}
                     type="number"
                     placeholder="Cost of refill"
+                    min="0"
                   />
                 </li>
                 <li>
@@ -171,6 +175,7 @@ class TrackingFormBase extends React.Component {
                     selected={entryDate}
                     maxDate={new Date()}
                     onChange={date => this.setState({ entryDate: date })}
+                    required
                   ></DatePicker>
                 </li>
                 <li>

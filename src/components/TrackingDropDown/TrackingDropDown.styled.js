@@ -3,13 +3,14 @@ import styled from "styled-components";
 export const StyledTrackingDropDown = styled.div`
 padding: 0;
   display: flex;
-  background-color: #ffecdb;
+  
   margin: 2% 0 2% 0;
 
   .custom-drop {
     flex: 1 0 280px;
     color: ${({ theme }) => theme.primaryDark};
     padding: 1% 0 1% 0;
+    background-color: #ffecdb;
   }
 
   }
