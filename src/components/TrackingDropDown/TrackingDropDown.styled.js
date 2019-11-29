@@ -1,15 +1,19 @@
 import styled from "styled-components";
 
-export const StyledTrackingDropDown = styled.div`
+export const StyledTrackingDropDown = styled.li`
 padding: 0;
   display: flex;
-  
-  margin: 2% 0 2% 0;
+
+
+
+  margin: 2% 0 4% 0;
 
   .custom-drop {
+    position: absolute;
     flex: 1 0 280px;
+    width: 280px;
     color: ${({ theme }) => theme.primaryDark};
-    padding: 1% 0 1% 0;
+    padding: 0;
     background-color: #ffecdb;
   }
 

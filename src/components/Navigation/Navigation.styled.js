@@ -16,7 +16,7 @@ export const StyledMenu = styled.nav`
   z-index: 100;
 
   @media (max-width: ${({ theme }) => theme.mobile}) {
-    width: 100%;
+    width: 80%;
   }
 
   .main-nav li {

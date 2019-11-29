@@ -12,6 +12,8 @@ import AdminPage from "../Admin";
 import CarPage from "../Cars";
 import Burger from "../Burger";
 
+import { StyledNavContainer } from "./App.styled";
+
 //TEMPORARY
 import TrackingFormBase from "../Track";
 
@@ -55,10 +57,10 @@ class App extends React.Component {
   render() {
     return (
       <Router>
-        <div ref={this.setWrapperRef}>
+        <StyledNavContainer ref={this.setWrapperRef}>
           <Burger open={this.state.open} changeOpen={this.changeOpen} />
           <Navigation open={this.state.open} />
-        </div>
+        </StyledNavContainer>
         <div>
           <hr />
           <Route exact path={ROUTES.LANDING} component={LandingPage} />

@@ -16,6 +16,7 @@ import {
   StyledMPG
 } from "./Home.styled";
 import Card from "../Card";
+import { useAuth } from "../../helper/helper";
 
 const INITIAL_STATE = {
   entries: [],
@@ -159,45 +160,73 @@ const summarizeData = entries => {
     ...e[1]
   }));
 
-  // Object.entries(temp1).map(e => {month: e[0], Object.entries(temp2).map(e => ({[e[0]]:e[1]}))
-
-  //Object.entries(temp1).map(e => ({month:e[0], Object.entries(e[1]).map(b => ({[b[0]]:b[1]}))}))
-
-  console.log("graphdata", graphData);
-
   return graphData;
 };
 
 const HomePage = ({ firebase }) => {
   const [state, setState] = useState(INITIAL_STATE);
-  //.getUserGasEntries(firebase.auth.currentUser.uid)
+  const { isLoading, user } = useAuth(firebase.auth);
+  console.log("user1", user);
   useEffect(() => {
-    setState({ loading: true });
+    async function fetchData() {
+      try {
+        setState({ loading: true });
+        const response = await firebase.getUserGasEntries(user.uid);
 
-    firebase.gasEntries().on("value", snapshot => {
-      const entriesObject = snapshot.val();
-
-      if (entriesObject) {
-        const entriesList = Object.keys(entriesObject).map(key => ({
-          ...entriesObject[key],
-          uid: key
-        }));
-        const avgEfficiency = avgMPG(entriesList);
-        const total = totalSpent(entriesList);
+        const entries = await response.on("value", snapshot => {
+          const entriesObject = snapshot.val();
+          console.log(entriesObject);
+          if (entriesObject) {
+            const entriesList = Object.keys(entriesObject).map(key => ({
+              ...entriesObject[key],
+              uid: key
+            }));
+            return entriesList;
+          }
+        });
+        const avgEfficiency = avgMPG(entries);
+        const total = totalSpent(entries);
         setState({
-          entries: entriesList,
+          entries: entries,
           loading: false,
           totalSpent: total,
           avgEfficiency: avgEfficiency
         });
-      } else {
-        setState({ entries: null, loading: false });
+      } catch (err) {
+        console.log(err);
+        setState({ loading: false, entries: null });
       }
-    });
 
-    //cleanup
-    return () => firebase.gasEntries().off();
-  }, []);
+      // setState({ loading: true });
+      // const unsubscribe = firebase
+      //   .getUserGasEntries(user.uid)
+      //   .on("value", snapshot => {
+      //     const entriesObject = snapshot.val();
+      //     console.log(entriesObject);
+      //     if (entriesObject) {
+      //       const entriesList = Object.keys(entriesObject).map(key => ({
+      //         ...entriesObject[key],
+      //         uid: key
+      //       }));
+      //       const avgEfficiency = avgMPG(entriesList);
+      //       const total = totalSpent(entriesList);
+      //       setState({
+      //         entries: entriesList,
+      //         loading: false,
+      //         totalSpent: total,
+      //         avgEfficiency: avgEfficiency
+      //       });
+      //     } else {
+      //       setState({ entries: null, loading: false });
+      //     }
+      //   });
+
+      // //cleanup
+      // //return () => firebase.gasEntries().off();
+      // return unsubscribe;
+    }
+    fetchData();
+  }, [user]);
   return (
     <AuthUserContext.Consumer>
       {authUser => (

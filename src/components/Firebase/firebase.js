@@ -44,23 +44,19 @@ class Firebase {
 
   // CARS
 
-  car = carId => this.db.ref(`cars/${carId}`);
-
-  getUsercars = userId =>
-    this.db
-      .ref(`cars`)
-      .orderByChild("userId")
-      .equalTo(userId);
+  car = (userId, carId) => this.db.ref(`cars/${userId}/${carId}`);
 
   cars = () => this.db.ref(`cars`);
+
+  getUsercars = userId => this.db.ref(`cars/${userId}`);
 
   doCreateCar = (userId, name, year) => {
     const newCarKey = this.db
       .ref()
-      .child("cars")
+      .child(`cars/${userId}`)
       .push().key;
 
-    return this.db.ref(`cars/${newCarKey}`).set({
+    return this.db.ref(`cars/${userId}/${newCarKey}`).set({
       userId: userId,
       carname: name,
       year: year,
@@ -70,31 +66,25 @@ class Firebase {
 
   //MPG tracking
 
-  gasEntry = uid => this.db.ref(`gasEntries/${uid}`);
+  gasEntry = (userId, gasId) => this.db.ref(`gasEntries/${userId}/${gasId}`);
 
   gasEntries = () => this.db.ref(`gasEntries`);
 
-  getCarGasEntries = carId => {
-    this.db
-      .ref(`gasEntries`)
-      .orderByChild("carId")
-      .equalTo(carId);
+  getCarGasEntries = (userId, carId) => {
+    this.db.ref(`gasEntries/${userId}/${carId}`);
   };
 
   getUserGasEntries = userId => {
-    this.db
-      .ref(`gasEntries`)
-      .orderByChild("userId")
-      .equalTo(userId);
+    this.db.ref(`gasEntries/${userId}`);
   };
 
   doCreateGasEntry = (userId, carId, mileage, liters, entryDate, cost) => {
     const newGasKey = this.db
       .ref()
-      .child("gasEntries")
+      .child(`gasEntries/${userId}`)
       .push().key;
 
-    return this.db.ref(`gasEntries/${newGasKey}`).set({
+    return this.db.ref(`gasEntries/${userId}/${newGasKey}`).set({
       userId: userId,
       carId: carId,
       mileage: mileage,
