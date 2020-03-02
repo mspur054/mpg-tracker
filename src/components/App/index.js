@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import Navigation from "../Navigation";
 import LandingPage from "../Landing";
@@ -11,6 +11,8 @@ import AccountPage from "../Account";
 import AdminPage from "../Admin";
 import CarPage from "../Cars";
 import Burger from "../Burger";
+import Car from "../Car";
+import NoMatch from "../NoMatch";
 
 import { StyledNavContainer } from "./App.styled";
 
@@ -63,15 +65,22 @@ class App extends React.Component {
         </StyledNavContainer>
         <div>
           <hr />
-          <Route exact path={ROUTES.LANDING} component={LandingPage} />
-          <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
-          <Route path={ROUTES.SIGN_IN} component={SignInPage} />
-          <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />
-          <Route path={ROUTES.HOME} component={HomePage} />
-          <Route path={ROUTES.ACCOUNT} component={AccountPage} />
-          <Route path={ROUTES.ADMIN} component={AdminPage} />
-          <Route path={ROUTES.CARS} component={CarPage} />
-          <Route path={ROUTES.DATA_ENTRY} component={TrackingFormBase} />
+          <Switch>
+            <Route exact path={ROUTES.LANDING} component={LandingPage} />
+            <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
+            <Route path={ROUTES.SIGN_IN} component={SignInPage} />
+            <Route
+              path={ROUTES.PASSWORD_FORGET}
+              component={PasswordForgetPage}
+            />
+            <Route path={ROUTES.HOME} component={HomePage} />
+            <Route path={ROUTES.ACCOUNT} component={AccountPage} />
+            <Route path={ROUTES.ADMIN} component={AdminPage} />
+            <Route exact path={ROUTES.CARS} component={CarPage} />
+            <Route path={ROUTES.DATA_ENTRY} component={TrackingFormBase} />
+            <Route path={`${ROUTES.CARS}/:id`} component={Car} />
+            <Route component={NoMatch} />
+          </Switch>
         </div>
       </Router>
     );
