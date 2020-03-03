@@ -31,31 +31,34 @@ class CarPageFormBase extends React.Component {
   }
 
   componentDidMount() {
-    this.onGetCars();
+    this.authSubscription = this.props.firebase.auth.onAuthStateChanged(
+      user => {
+        this.onGetCars(user);
+      }
+    );
   }
 
-  onGetCars = () => {
+  onGetCars = user => {
     this.setState({ loading: true });
 
-    this.props.firebase
-      .getUsercars(this.props.firebase.auth.currentUser.uid)
-      .on("value", snapshot => {
-        const carObject = snapshot.val();
+    this.props.firebase.getUsercars(user.uid).on("value", snapshot => {
+      const carObject = snapshot.val();
 
-        if (carObject) {
-          const carList = Object.keys(carObject).map(key => ({
-            ...carObject[key],
-            uid: key
-          }));
-          this.setState({ cars: carList, loading: false });
-        } else {
-          this.setState({ cars: null, loading: false });
-        }
-      });
+      if (carObject) {
+        const carList = Object.keys(carObject).map(key => ({
+          ...carObject[key],
+          uid: key
+        }));
+        this.setState({ cars: carList, loading: false });
+      } else {
+        this.setState({ cars: null, loading: false });
+      }
+    });
   };
 
   componentWillUnmount() {
     this.props.firebase.cars().off();
+    this.authSubscription();
   }
 
   onEditCar = (car, updatedCar) => {
@@ -67,8 +70,8 @@ class CarPageFormBase extends React.Component {
     });
   };
 
-  onDeleteCar = uid => {
-    this.props.firebase.car(uid).remove();
+  onDeleteCar = (userId, uid) => {
+    this.props.firebase.car(userId, uid).remove();
   };
 
   onSubmit = (event, authUser) => {

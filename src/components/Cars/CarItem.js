@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { CARS } from "../../constants/routes";
+import { Link } from "react-router-dom";
 
 import {
   StyledCarItem,
@@ -76,7 +78,15 @@ const CarItem = ({ car, ...props }) => {
           ) : (
             <>
               <span>
-                <strong>{state.car.carname}</strong> - {car.year}
+                <Link
+                  to={{
+                    pathname: `${CARS}/${state.car.uid}`,
+                    state: { ...car }
+                  }}
+                >
+                  <strong>{state.car.carname}</strong>
+                </Link>{" "}
+                - {car.year}
                 {car.editedAt && <span> (Edited)</span>}
               </span>
               <StyledCarItemButton onClick={onToggleEditMode}>
@@ -88,7 +98,7 @@ const CarItem = ({ car, ...props }) => {
           {!editMode && (
             <StyledCarItemButton
               type="button"
-              onClick={() => onDeleteCar(car.uid)}
+              onClick={() => onDeleteCar(authUser.uid, car.uid)}
             >
               Delete
             </StyledCarItemButton>
