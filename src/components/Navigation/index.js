@@ -51,7 +51,7 @@ const NavigatonAuth = () => (
 );
 
 const NavigationNonAuth = () => (
-  <ul>
+  <ul className="main-nav">
     <li>
       <Link to={ROUTES.SIGN_IN}>Sign In</Link>
     </li>
