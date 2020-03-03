@@ -6,6 +6,8 @@ export const StyledTrackingFormInput = styled.input`
 
 export const StyledTrackingLabel = styled.label`
   flex: 1 0 auto;
+  margin-bottom: 5px;
+  font-weight: 600;
 `;
 
 export const StyledTrackingForm = styled.ul`
@@ -15,6 +17,12 @@ export const StyledTrackingForm = styled.ul`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    margin-bottom: 15px;
+  }
+
+  li > label {
+    font-weight: 600;
+    margin-bottom: 5px;
   }
 
   li > input {
@@ -23,12 +31,27 @@ export const StyledTrackingForm = styled.ul`
 
   li > label,
   li p {
-    flex: 1 0 120px;
-    max-width: 280px;
+    flex: 1 0 280px;
+    text-align: left;
   }
 
   li > label + * {
     flex: 1 0 280px;
+  }
+
+  input,
+  select {
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+  }
+
+  input:focus {
+    border: 1px solid #00bfff;
+  }
+
+  select {
+    width: 100%;
   }
 `;
 

@@ -6,11 +6,9 @@ import { withRouter } from "react-router-dom";
 import { AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
 
-import TrackingDropDown from "../TrackingDropDown";
 import {
   StyledTrackingForm,
-  StyledTrackingFormButton,
-  StyledTrackingFormInput
+  StyledTrackingFormButton
 } from "./TrackingForm.styled";
 
 import * as ROUTES from "../../constants/routes";
@@ -58,17 +56,14 @@ class TrackingFormBase extends React.Component {
             ...carObject[key],
             uid: key
           }));
-          const ddList = [];
-          carList.forEach((car, i) => {
-            ddList[i] = {
-              value: car.uid,
-              label: car.carname
-            };
-          });
 
-          this.setState({ cars: carList, loading: false, ddCars: ddList });
+          this.setState({
+            cars: carList,
+            loading: false,
+            selectedCar: { value: carList[0].uid, label: carList[0].carname }
+          });
         } else {
-          this.setState({ cars: null, loading: false, ddCars: null });
+          this.setState({ cars: null, loading: false });
         }
       });
   };
@@ -113,30 +108,45 @@ class TrackingFormBase extends React.Component {
       liters,
       entryDate,
       error,
-      ddCars,
       loading,
       cost,
-      selectedCar
+      selectedCar,
+      cars
     } = this.state;
     const isInvalid = mileage === "" || liters === "" || entryDate === "";
-    const defaultOption = selectedCar.label;
 
     return (
       <AuthUserContext.Consumer>
         {authUser => (
           <>
-            <h1>Add an Entry</h1>
-            <form onSubmit={event => this.onSubmit(event, authUser)}>
+            <h1>Add a Fuel Up</h1>
+            <form
+              autoComplete="off"
+              onSubmit={event => this.onSubmit(event, authUser)}
+            >
               <StyledTrackingForm>
                 {loading && <div>Loading...</div>}
-                <TrackingDropDown
-                  ddCars={ddCars}
-                  defaultOption={defaultOption}
-                  onChange={this.onSelectCar}
-                ></TrackingDropDown>
+
                 <li>
-                  <label for="mileage">Mileage</label>
-                  <StyledTrackingFormInput
+                  <label>Vehicle</label>
+                  {!loading && (
+                    <select
+                      onChange={event =>
+                        this.setState({
+                          selectedCar: { value: event.target.value }
+                        })
+                      }
+                      value={this.state.selectedCar.value}
+                    >
+                      {cars.map(car => {
+                        return <option value={car.uid}>{car.carname}</option>;
+                      })}
+                    </select>
+                  )}
+                </li>
+                <li>
+                  <label htmlFor="mileage">Kilometers since last refill</label>
+                  <input
                     name="mileage"
                     value={mileage}
                     onChange={this.onChange}
@@ -147,7 +157,7 @@ class TrackingFormBase extends React.Component {
                   />
                 </li>
                 <li>
-                  <label for="liters">Gas Consumed</label>
+                  <label htmlFor="liters">Gas Consumed</label>
                   <input
                     required
                     name="liters"
@@ -158,7 +168,7 @@ class TrackingFormBase extends React.Component {
                   />
                 </li>
                 <li>
-                  <label for="cost">Cost</label>
+                  <label htmlFor="cost">Total Cost</label>
                   <input
                     name="cost"
                     value={cost}
@@ -169,7 +179,7 @@ class TrackingFormBase extends React.Component {
                   />
                 </li>
                 <li>
-                  <label for="entryDate">Date of Refill</label>
+                  <label htmlFor="entryDate">Date of Refill</label>
                   <DatePicker
                     name="entryDate"
                     selected={entryDate}
@@ -180,7 +190,7 @@ class TrackingFormBase extends React.Component {
                 </li>
                 <li>
                   <StyledTrackingFormButton disabled={isInvalid} type="submit">
-                    Add Entry
+                    Save
                   </StyledTrackingFormButton>
                 </li>
                 {error && <p>{error.message}</p>}
