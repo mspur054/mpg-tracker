@@ -7,10 +7,12 @@ import { PasswordForgetLink } from "../PasswordForget";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../../constants/routes";
 
+import { StyledSignInForm } from "./SignIn.styled";
+
 const SignInPage = () => {
   return (
     <div>
-      <h1>SignIn</h1>
+      <h1>Sign In</h1>
       <SignInForm></SignInForm>
       <PasswordForgetLink></PasswordForgetLink>
       <SignUpLink></SignUpLink>
@@ -55,33 +57,36 @@ class SignInFormBase extends React.Component {
     const isInvalid = password === "" || email === "";
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          name="email"
-          value={email}
-          onChange={this.onChange}
-          type="text"
-          placeholder="Email Address"
-        ></input>
-        <input
-          name="password"
-          value={password}
-          onChange={this.onChange}
-          type="password"
-          placeholder="Password"
-        />
+      <StyledSignInForm onSubmit={this.onSubmit}>
+        <div>
+          <label>Email</label>
+          <input
+            name="email"
+            value={email}
+            onChange={this.onChange}
+            type="text"
+            placeholder="Email Address"
+          ></input>
+        </div>
+        <div>
+          <label>Password</label>
+          <input
+            name="password"
+            value={password}
+            onChange={this.onChange}
+            type="password"
+            placeholder="Password"
+          />
+        </div>
         <button disabled={isInvalid} type="submit">
           Sign In
         </button>
         {error && <p>{error.message}</p>}
-      </form>
+      </StyledSignInForm>
     );
   }
 }
 
-const SignInForm = compose(
-  withRouter,
-  withFirebase
-)(SignInFormBase);
+const SignInForm = compose(withRouter, withFirebase)(SignInFormBase);
 export default SignInPage;
 export { SignInForm };
