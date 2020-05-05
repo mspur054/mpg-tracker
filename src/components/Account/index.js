@@ -1,32 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { compose } from "recompose";
 import { withFirebase } from "../Firebase";
 
 import { AuthUserContext, withAuthorization } from "../Session";
 import { PasswordForgetForm } from "../PasswordForget";
-import PasswordChangeForm from "../PasswordChange";
+import Spinner from "../Spinner";
 
 const INITIAL_STATE = {
   user: null,
-  loading: false
+  loading: false,
 };
 
 const AccountPage = ({ firebase }) => {
   const [state, setState] = useState(INITIAL_STATE);
+  // ! Figure out how to use this instead of
+  const { authUser } = useContext(AuthUserContext);
 
   useEffect(() => {
     setState({ loading: true });
-
-    firebase.auth.onAuthStateChanged(function(user) {
+    firebase.auth.onAuthStateChanged(function (user) {
       if (user) {
         const response = firebase.db.ref(`/users/${user.uid}`);
 
-        const userData = response.on("value", snapshot => {
+        const userData = response.on("value", (snapshot) => {
           const entriesObject = snapshot.val();
           if (entriesObject) {
             setState({
               user: entriesObject,
-              loading: false
+              loading: false,
             });
           }
         });
@@ -35,21 +36,21 @@ const AccountPage = ({ firebase }) => {
 
         setState({
           user: null,
-          loading: false
+          loading: false,
         });
       }
     });
-  }, []);
+  }, [authUser]);
   const { user, loading } = state;
   return (
     <AuthUserContext.Consumer>
-      {authUser => (
+      {(authUser) => (
         <div>
           <h1>Account Dashboard</h1>
-          {loading && <div>loading...</div>}
+          {loading && <Spinner />}
           {user && (
             <>
-              <p>Hello {user.username}</p>
+              <p>Hello {user.username}!</p>
               <p>
                 From the Account Dashboard you can update your account
                 information.
@@ -62,13 +63,12 @@ const AccountPage = ({ firebase }) => {
             </>
           )}
           <PasswordForgetForm />
-          <PasswordChangeForm />
         </div>
       )}
     </AuthUserContext.Consumer>
   );
 };
 
-const condition = authUser => !!authUser;
+const condition = (authUser) => !!authUser;
 
 export default compose(withFirebase, withAuthorization(condition))(AccountPage);

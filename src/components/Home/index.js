@@ -3,8 +3,8 @@ import { compose } from "recompose";
 import {
   VictoryChart,
   VictoryAxis,
-  VictoryLine,
-  VictoryTooltip
+  VictoryLine
+  // VictoryTooltip
 } from "victory";
 
 import { withAuthorization, AuthUserContext } from "../Session";
@@ -15,16 +15,19 @@ import {
   StyledSpentOnGas,
   StyledMPG
 } from "./Home.styled";
+
+import Spinner from "../Spinner";
+
 import Card from "../Card";
 import { useAuth } from "../../helper/helper";
 
 const INITIAL_STATE = {
-  entries: [],
-  loading: false,
+  entries: null,
+  loading: true,
   error: null,
   totalSpent: null,
   avgEfficiency: null,
-  chartData: []
+  chartData: null
 };
 
 const CHART_INITIAL_STATE = {
@@ -48,7 +51,7 @@ const MpgChart = entries => {
         chartData: monthlyData
       });
     } catch (e) {
-      console.log(e);
+      //sconsole.log(e);
       setState({ isLoading: false });
     }
   }, [entries]);
@@ -92,29 +95,84 @@ const getUpperYDomain = monthlyData => {
   return Math.ceil(maxVal / 100) * 100;
 };
 
-const HomePageBase = ({ loading, entries, totalSpent, avgEfficiency }) => {
-  return (
-    <div>
-      <h1>Home Page</h1>
-      <p>The home page is accessible to signed in users.</p>
-      {loading && <div>Loading...</div>}
-      {entries && (
-        <StyledInformationContainer>
-          <StyledNumEntries>{entries.length}</StyledNumEntries>
-          <StyledSpentOnGas>{`$${Math.round(totalSpent * 100) /
-            100}`}</StyledSpentOnGas>
-          <StyledMPG>{`${Math.round(avgEfficiency * 100) /
-            100} l/100 km`}</StyledMPG>
-          <Card header="Monthly AVG Cost" body={MpgChart(entries)} />
-        </StyledInformationContainer>
-      )}
+class HomePageBase extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { ...INITIAL_STATE };
+  }
 
-      {/* {!cars && <div>There are no cars...</div>} */}
-    </div>
-  );
-};
+  componentDidMount() {
+    this.authSubscription = this.props.firebase.auth.onAuthStateChanged(
+      user => {
+        this.onGetEntries(user);
+      }
+    );
+  }
 
-const condition = authUser => !!authUser;
+  onGetEntries = user => {
+    try {
+      this.setState({ loading: true });
+
+      this.props.firebase.db
+        .ref(`gasEntries/${user.uid}`)
+        .once("value", snapshot => {
+          const entriesObject = snapshot.val();
+
+          if (entriesObject) {
+            const entriesList = Object.keys(entriesObject).map(key => ({
+              ...entriesObject[key],
+              uid: key
+            }));
+            const total = totalSpent(entriesList);
+            const avg = avgMPG(entriesList);
+            this.setState({
+              entries: entriesList,
+              loading: false,
+              totalSpent: total,
+              avgEfficiency: avg
+            });
+          } else {
+            this.setState({ entries: null, loading: false });
+          }
+        });
+    } catch (err) {
+      console.log(err);
+      this.setState({ loading: false, error: err });
+    }
+  };
+
+  componentWillUnmount() {
+    this.props.firebase.gasEntries().off();
+    this.authSubscription();
+  }
+
+  render() {
+    const { loading, entries, totalSpent, avgEfficiency, error } = this.state;
+    return (
+      <AuthUserContext.Consumer>
+        {authUser => (
+          <div>
+            <h1>Home Page</h1>
+            {loading && <Spinner />}
+            {error && <div>ERROR:</div>}
+            {entries && (
+              <StyledInformationContainer>
+                <StyledNumEntries>{entries.length}</StyledNumEntries>
+                <StyledSpentOnGas>{`$${Math.round(totalSpent * 100) /
+                  100}`}</StyledSpentOnGas>
+                <StyledMPG>{`${Math.round(avgEfficiency * 100) /
+                  100} l/100 km`}</StyledMPG>
+                {/* <Card header="Monthly AVG Cost" body={MpgChart(entries)} /> */}
+              </StyledInformationContainer>
+            )}
+
+            {/* {!cars && <div>There are no cars...</div>} */}
+          </div>
+        )}
+      </AuthUserContext.Consumer>
+    );
+  }
+}
 
 const totalSpent = entries => {
   const reducer = (acc, currval) => acc + currval;
@@ -163,84 +221,10 @@ const summarizeData = entries => {
   return graphData;
 };
 
-const HomePage = ({ firebase }) => {
-  const [state, setState] = useState(INITIAL_STATE);
-  const { isLoading, user } = useAuth(firebase.auth);
-  console.log("user1", user);
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setState({ loading: true });
-        const response = await firebase.getUserGasEntries(user.uid);
+const condition = authUser => !!authUser;
 
-        const entries = await response.on("value", snapshot => {
-          const entriesObject = snapshot.val();
-          console.log(entriesObject);
-          if (entriesObject) {
-            const entriesList = Object.keys(entriesObject).map(key => ({
-              ...entriesObject[key],
-              uid: key
-            }));
-            return entriesList;
-          }
-        });
-        const avgEfficiency = avgMPG(entries);
-        const total = totalSpent(entries);
-        setState({
-          entries: entries,
-          loading: false,
-          totalSpent: total,
-          avgEfficiency: avgEfficiency
-        });
-      } catch (err) {
-        console.log(err);
-        setState({ loading: false, entries: null });
-      }
-
-      // setState({ loading: true });
-      // const unsubscribe = firebase
-      //   .getUserGasEntries(user.uid)
-      //   .on("value", snapshot => {
-      //     const entriesObject = snapshot.val();
-      //     console.log(entriesObject);
-      //     if (entriesObject) {
-      //       const entriesList = Object.keys(entriesObject).map(key => ({
-      //         ...entriesObject[key],
-      //         uid: key
-      //       }));
-      //       const avgEfficiency = avgMPG(entriesList);
-      //       const total = totalSpent(entriesList);
-      //       setState({
-      //         entries: entriesList,
-      //         loading: false,
-      //         totalSpent: total,
-      //         avgEfficiency: avgEfficiency
-      //       });
-      //     } else {
-      //       setState({ entries: null, loading: false });
-      //     }
-      //   });
-
-      // //cleanup
-      // //return () => firebase.gasEntries().off();
-      // return unsubscribe;
-    }
-    fetchData();
-  }, [user]);
-  return (
-    <AuthUserContext.Consumer>
-      {authUser => (
-        <div>
-          <HomePageBase
-            totalSpent={state.totalSpent}
-            entries={state.entries}
-            loading={state.loading}
-            avgEfficiency={state.avgEfficiency}
-          />
-        </div>
-      )}
-    </AuthUserContext.Consumer>
-  );
-};
-
-export default compose(withFirebase, withAuthorization(condition))(HomePage);
+//export default compose(withFirebase, withAuthorization(condition))(HomePage);
+export default compose(
+  withFirebase,
+  withAuthorization(condition)
+)(HomePageBase);
