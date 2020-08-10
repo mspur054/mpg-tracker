@@ -4,17 +4,23 @@ export const GlobalStyles = createGlobalStyle`
   html, body {
     margin: 0;
     padding: 0;
+ 
   }
-  *, *::after, *::before {
-    box-sizing: border-box;
+
+  #root {
+    height: 100vh;
   }
+
+  // *, *::after, *::before {
+  //   box-sizing: border-box;
+  // }
   body {
     display: flex;
     justify-content: center;
     align-items: center;
     background: ${({ theme }) => theme.primaryDark};
     color: ${({ theme }) => theme.primaryLight};
-    height: 100vh;
+    
     text-rendering: optimizeLegibility;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   }
@@ -31,9 +37,9 @@ export const GlobalStyles = createGlobalStyle`
   div {
     text-align: center;
   }
-  small {
-    display: block;
-  }
+  // small {
+  //   display: block;
+  // }
   button{
     background-color: lightcoral; 
     border: none;
@@ -47,4 +53,13 @@ export const GlobalStyles = createGlobalStyle`
   a {
     color: ${({ theme }) => theme.primaryHover};
     text-decoration: none;
-  }`;
+  }
+  html {
+    height: 100%;
+  }
+  body {
+    height: 100%;
+  }
+
+
+`;
