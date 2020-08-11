@@ -3,7 +3,7 @@ import { compose } from "recompose";
 import {
   VictoryChart,
   VictoryAxis,
-  VictoryLine
+  VictoryLine,
   // VictoryTooltip
 } from "victory";
 
@@ -13,7 +13,7 @@ import {
   StyledNumEntries,
   StyledInformationContainer,
   StyledSpentOnGas,
-  StyledMPG
+  StyledMPG,
 } from "./Home.styled";
 
 import Spinner from "../Spinner";
@@ -27,16 +27,16 @@ const INITIAL_STATE = {
   error: null,
   totalSpent: null,
   avgEfficiency: null,
-  chartData: null
+  chartData: null,
 };
 
 const CHART_INITIAL_STATE = {
   //! FIX THIS
   isLoading: true,
-  chartData: []
+  chartData: [],
 };
 
-const MpgChart = entries => {
+const MpgChart = (entries) => {
   const [state, setState] = useState(CHART_INITIAL_STATE);
 
   const today = new Date();
@@ -48,7 +48,7 @@ const MpgChart = entries => {
 
       setState({
         isLoading: false,
-        chartData: monthlyData
+        chartData: monthlyData,
       });
     } catch (e) {
       //sconsole.log(e);
@@ -75,7 +75,7 @@ const MpgChart = entries => {
       />
       <VictoryAxis
         crossAxis
-        tickFormat={t => `${Math.round(t)}`}
+        tickFormat={(t) => `${Math.round(t)}`}
         tickCount={monthlyDomain[1] - monthlyDomain[0]}
         domain={{ x: monthlyDomain }}
       />
@@ -84,10 +84,10 @@ const MpgChart = entries => {
   );
 };
 
-const getUpperYDomain = monthlyData => {
+const getUpperYDomain = (monthlyData) => {
   const maxVal = Math.max.apply(
     Math,
-    monthlyData.map(function(o) {
+    monthlyData.map(function (o) {
       return o.cost;
     })
   );
@@ -103,25 +103,25 @@ class HomePageBase extends React.Component {
 
   componentDidMount() {
     this.authSubscription = this.props.firebase.auth.onAuthStateChanged(
-      user => {
+      (user) => {
         this.onGetEntries(user);
       }
     );
   }
 
-  onGetEntries = user => {
+  onGetEntries = (user) => {
     try {
       this.setState({ loading: true });
 
       this.props.firebase.db
         .ref(`gasEntries/${user.uid}`)
-        .once("value", snapshot => {
+        .once("value", (snapshot) => {
           const entriesObject = snapshot.val();
 
           if (entriesObject) {
-            const entriesList = Object.keys(entriesObject).map(key => ({
+            const entriesList = Object.keys(entriesObject).map((key) => ({
               ...entriesObject[key],
-              uid: key
+              uid: key,
             }));
             const total = totalSpent(entriesList);
             const avg = avgMPG(entriesList);
@@ -129,7 +129,7 @@ class HomePageBase extends React.Component {
               entries: entriesList,
               loading: false,
               totalSpent: total,
-              avgEfficiency: avg
+              avgEfficiency: avg,
             });
           } else {
             this.setState({ entries: null, loading: false });
@@ -150,7 +150,7 @@ class HomePageBase extends React.Component {
     const { loading, entries, totalSpent, avgEfficiency, error } = this.state;
     return (
       <AuthUserContext.Consumer>
-        {authUser => (
+        {(authUser) => (
           <div>
             <h1>Home Page</h1>
             {loading && <Spinner />}
@@ -158,10 +158,12 @@ class HomePageBase extends React.Component {
             {entries && (
               <StyledInformationContainer>
                 <StyledNumEntries>{entries.length}</StyledNumEntries>
-                <StyledSpentOnGas>{`$${Math.round(totalSpent * 100) /
-                  100}`}</StyledSpentOnGas>
-                <StyledMPG>{`${Math.round(avgEfficiency * 100) /
-                  100} l/100 km`}</StyledMPG>
+                <StyledSpentOnGas>{`$${
+                  Math.round(totalSpent * 100) / 100
+                }`}</StyledSpentOnGas>
+                <StyledMPG>{`${
+                  Math.round(avgEfficiency * 100) / 100
+                } l/100 km`}</StyledMPG>
                 {/* <Card header="Monthly AVG Cost" body={MpgChart(entries)} /> */}
               </StyledInformationContainer>
             )}
@@ -174,25 +176,25 @@ class HomePageBase extends React.Component {
   }
 }
 
-const totalSpent = entries => {
+const totalSpent = (entries) => {
   const reducer = (acc, currval) => acc + currval;
-  const total = entries.map(x => parseFloat(x.cost)).reduce(reducer);
+  const total = entries.map((x) => parseFloat(x.cost)).reduce(reducer);
 
   return total;
 };
 
-const avgMPG = entries => {
+const avgMPG = (entries) => {
   const reducer = (acc, currval) => acc + currval;
   const entrympg = entries
-    .map(e => (e.liters / e.mileage) * 100)
+    .map((e) => (e.liters / e.mileage) * 100)
     .reduce(reducer);
   const avg = entrympg / entries.length;
   return avg;
 };
 
-const summarizeData = entries => {
+const summarizeData = (entries) => {
   //might bnot be necessary
-  entries.forEach(e => (e.month = new Date(e.dateAdded).getMonth() + 1));
+  entries.forEach((e) => (e.month = new Date(e.dateAdded).getMonth() + 1));
 
   //Fields to summarize
   const keys = ["cost", "liters", "mileage"];
@@ -205,7 +207,7 @@ const summarizeData = entries => {
       acc[cur.month].records += 1;
     }
     //loop through fields to summarize
-    keys.forEach(prop => {
+    keys.forEach((prop) => {
       acc[cur.month].hasOwnProperty(prop)
         ? (acc[cur.month][prop] += Number(cur[prop]))
         : (acc[cur.month][prop] = Number(cur[prop]));
@@ -213,15 +215,15 @@ const summarizeData = entries => {
     return acc;
   }, {});
 
-  const graphData = Object.entries(monthlyData).map(e => ({
+  const graphData = Object.entries(monthlyData).map((e) => ({
     month: parseInt(e[0], 10),
-    ...e[1]
+    ...e[1],
   }));
 
   return graphData;
 };
 
-const condition = authUser => !!authUser;
+const condition = (authUser) => !!authUser;
 
 //export default compose(withFirebase, withAuthorization(condition))(HomePage);
 export default compose(

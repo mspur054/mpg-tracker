@@ -25,15 +25,20 @@ const INITIAL_STATE = {
 };
 
 class CarPageFormBase extends React.Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
     this.state = { ...INITIAL_STATE };
   }
 
   componentDidMount() {
+    this._isMounted = true;
     this.authSubscription = this.props.firebase.auth.onAuthStateChanged(
       user => {
-        this.onGetCars(user);
+        if (this._isMounted) {
+          this.onGetCars(user);
+        }
       }
     );
   }
@@ -57,6 +62,7 @@ class CarPageFormBase extends React.Component {
   };
 
   componentWillUnmount() {
+    this._isMounted = false;
     this.props.firebase.cars().off();
     this.authSubscription();
   }
@@ -71,7 +77,7 @@ class CarPageFormBase extends React.Component {
   };
 
   onDeleteCar = (userId, uid) => {
-    this.props.firebase.car(userId, uid).remove();
+    this.props.firebase.deleteCar(userId, uid);
   };
 
   onSubmit = (event, authUser) => {
