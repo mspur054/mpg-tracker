@@ -10,24 +10,24 @@ class AdminPage extends Component {
 
     this.state = {
       loading: false,
-      users: []
+      users: [],
     };
   }
 
   componentDidMount() {
     this.setState({ loading: true, error: null });
 
-    this.props.firebase.users().on("value", snapshot => {
+    this.props.firebase.users().on("value", (snapshot) => {
       const usersObject = snapshot.val();
 
-      const usersList = Object.keys(usersObject).map(key => ({
+      const usersList = Object.keys(usersObject).map((key) => ({
         ...usersObject[key],
-        uid: key
+        uid: key,
       }));
 
       this.setState({
         users: usersList,
-        loading: false
+        loading: false,
       });
     });
   }
@@ -47,6 +47,16 @@ class AdminPage extends Component {
 
         <UserList users={users} />
         {error && <p>{error.message}</p>}
+
+        <button
+          onClick={() =>
+            this.props.firebase.doAddKmPerHundred(
+              this.props.firebase.auth.currentUser.uid
+            )
+          }
+        >
+          Update
+        </button>
       </div>
     );
   }
@@ -54,7 +64,7 @@ class AdminPage extends Component {
 
 const UserList = ({ users }) => (
   <ul>
-    {users.map(user => (
+    {users.map((user) => (
       <li key={user.uid}>
         <span>
           <strong>ID:</strong> {user.uid}
@@ -70,9 +80,6 @@ const UserList = ({ users }) => (
   </ul>
 );
 
-const condition = authUser => !!authUser;
+const condition = (authUser) => !!authUser;
 
-export default compose(
-  withFirebase,
-  withAuthorization(condition)
-)(AdminPage);
+export default compose(withFirebase, withAuthorization(condition))(AdminPage);

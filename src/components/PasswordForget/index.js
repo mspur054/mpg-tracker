@@ -14,15 +14,13 @@ const PasswordForgetPage = () => (
 );
 
 const validationSchema = Yup.object({
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email Required")
+  email: Yup.string().email("Invalid email address").required("Email Required"),
 });
 
-const PasswordHook = ({ firebase }) => {
+const PasswordHook = ({ firebase, ...props }) => {
   const { handleSubmit, handleChange, handleBlur, errors } = useFormik({
     initialValues: {
-      email: ""
+      email: "",
     },
     validationSchema,
     onSubmit: (values, { resetForm, setErrors }) => {
@@ -31,10 +29,10 @@ const PasswordHook = ({ firebase }) => {
         .then(() => {
           resetForm();
         })
-        .catch(error => {
+        .catch((error) => {
           setErrors({ email: error.message });
         });
-    }
+    },
   });
 
   return (

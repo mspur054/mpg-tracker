@@ -8,7 +8,7 @@ import { withFirebase } from "../Firebase";
 
 import {
   StyledTrackingForm,
-  StyledTrackingFormButton
+  StyledTrackingFormButton,
 } from "./TrackingForm.styled";
 
 import * as ROUTES from "../../constants/routes";
@@ -23,7 +23,7 @@ const INITIAL_STATE = {
   entryDate: new Date(),
   loading: false,
   cars: [],
-  ddCars: []
+  allFieldsValid: false,
 };
 
 class TrackingFormBase extends React.Component {
@@ -34,7 +34,7 @@ class TrackingFormBase extends React.Component {
 
   componentDidMount() {
     const self = this;
-    this.props.firebase.auth.onAuthStateChanged(function(user) {
+    this.props.firebase.auth.onAuthStateChanged(function (user) {
       if (user) {
         console.log(self.onGetCars());
       } else {
@@ -48,19 +48,19 @@ class TrackingFormBase extends React.Component {
 
     this.props.firebase
       .getUsercars(this.props.firebase.auth.currentUser.uid)
-      .on("value", snapshot => {
+      .on("value", (snapshot) => {
         const carObject = snapshot.val();
 
         if (carObject) {
-          const carList = Object.keys(carObject).map(key => ({
+          const carList = Object.keys(carObject).map((key) => ({
             ...carObject[key],
-            uid: key
+            uid: key,
           }));
 
           this.setState({
             cars: carList,
             loading: false,
-            selectedCar: { value: carList[0].uid, label: carList[0].carname }
+            selectedCar: { value: carList[0].uid, label: carList[0].carname },
           });
         } else {
           this.setState({ cars: null, loading: false });
@@ -72,7 +72,7 @@ class TrackingFormBase extends React.Component {
     this.props.firebase.cars().off();
   }
 
-  onSelectCar = car => {
+  onSelectCar = (car) => {
     this.setState({ selectedCar: car });
   };
 
@@ -92,13 +92,14 @@ class TrackingFormBase extends React.Component {
         this.setState({ ...INITIAL_STATE });
         this.props.history.push(ROUTES.HOME);
       })
-      .catch(error => {
+      .catch((error) => {
+        // TODO: Show errors...
         this.setState({ error });
       });
     event.preventDefault();
   };
 
-  onChange = event => {
+  onChange = (event) => {
     this.setState({ [event.target.name]: event.target.value });
   };
 
@@ -111,18 +112,18 @@ class TrackingFormBase extends React.Component {
       loading,
       cost,
       selectedCar,
-      cars
+      cars,
     } = this.state;
     const isInvalid = mileage === "" || liters === "" || entryDate === "";
 
     return (
       <AuthUserContext.Consumer>
-        {authUser => (
+        {(authUser) => (
           <>
             <h1>Add a Fuel Up</h1>
             <form
               autoComplete="off"
-              onSubmit={event => this.onSubmit(event, authUser)}
+              onSubmit={(event) => this.onSubmit(event, authUser)}
             >
               <StyledTrackingForm>
                 {loading && <div>Loading...</div>}
@@ -131,15 +132,20 @@ class TrackingFormBase extends React.Component {
                   <label>Vehicle</label>
                   {!loading && (
                     <select
-                      onChange={event =>
+                      required
+                      onChange={(event) =>
                         this.setState({
-                          selectedCar: { value: event.target.value }
+                          selectedCar: { value: event.target.value },
                         })
                       }
-                      value={this.state.selectedCar.value}
+                      value={this.state.selectedCar.value || ""}
                     >
-                      {cars.map(car => {
-                        return <option value={car.uid}>{car.carname}</option>;
+                      {cars.map((car) => {
+                        return (
+                          <option key={car.uid} value={car.uid}>
+                            {car.carname}
+                          </option>
+                        );
                       })}
                     </select>
                   )}
@@ -152,6 +158,7 @@ class TrackingFormBase extends React.Component {
                     onChange={this.onChange}
                     type="number"
                     placeholder="Distance travelled"
+                    step=".01"
                     min="0"
                     required
                   />
@@ -163,7 +170,7 @@ class TrackingFormBase extends React.Component {
                     name="liters"
                     value={liters}
                     onChange={this.onChange}
-                    type="text"
+                    type="number"
                     placeholder="Gas consumed"
                   />
                 </li>
@@ -175,6 +182,7 @@ class TrackingFormBase extends React.Component {
                     onChange={this.onChange}
                     type="number"
                     placeholder="Cost of refill"
+                    step=".01"
                     min="0"
                   />
                 </li>
@@ -184,7 +192,7 @@ class TrackingFormBase extends React.Component {
                     name="entryDate"
                     selected={entryDate}
                     maxDate={new Date()}
-                    onChange={date => this.setState({ entryDate: date })}
+                    onChange={(date) => this.setState({ entryDate: date })}
                     required
                   ></DatePicker>
                 </li>

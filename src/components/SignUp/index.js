@@ -4,14 +4,23 @@ import { compose } from "recompose";
 
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../../constants/routes";
-import { StyledSignInForm } from "../SignIn/SignIn.styled";
+import {
+  StyledContainer,
+  StyledRow,
+  StyledHeading,
+  StyledSignUpDiv
+} from "./SignUp.styled";
 
 const SignUpPage = () => {
   return (
-    <div>
-      <h1>Sign Up</h1>
-      <SignUpForm />
-    </div>
+    <StyledContainer>
+      <StyledRow>
+        <StyledHeading>
+          <h1>Sign Up</h1>
+        </StyledHeading>
+        <SignUpForm />
+      </StyledRow>
+    </StyledContainer>
   );
 };
 
@@ -66,53 +75,55 @@ class SignUpFormBase extends Component {
       username === "";
 
     return (
-      <StyledSignInForm onSubmit={this.onSubmit}>
-        <div>
-          <label>Username</label>
-          <input
-            name="username"
-            value={username}
-            onChange={this.onChange}
-            type="text"
-            placeholder="Full Name"
-          />
-        </div>
-        <div>
-          <label>Email</label>
-          <input
-            name="email"
-            value={email}
-            onChange={this.onChange}
-            type="text"
-            placeholder="Email Address"
-          />
-        </div>
-        <div>
-          <label>Password</label>
-          <input
-            name="passwordOne"
-            value={passwordOne}
-            onChange={this.onChange}
-            type="password"
-            placeholder="Password"
-          />
-        </div>
-        <div>
-          <label>Repeat Password</label>
+      <StyledSignUpDiv>
+        <form onSubmit={this.onSubmit}>
+          <div>
+            <label>Username</label>
+            <input
+              name="username"
+              value={username}
+              onChange={this.onChange}
+              type="text"
+              placeholder="Full Name"
+            />
+          </div>
+          <div>
+            <label>Email</label>
+            <input
+              name="email"
+              value={email}
+              onChange={this.onChange}
+              type="text"
+              placeholder="Email Address"
+            />
+          </div>
+          <div>
+            <label>Password</label>
+            <input
+              name="passwordOne"
+              value={passwordOne}
+              onChange={this.onChange}
+              type="password"
+              placeholder="Password"
+            />
+          </div>
+          <div>
+            <label>Repeat Password</label>
 
-          <input
-            name="passwordTwo"
-            value={passwordTwo}
-            onChange={this.onChange}
-            type="password"
-            placeholder="Confirm Password"
-          />
-        </div>
-        <button disabled={isInvalid} type="submit">
-          Sign Up
-        </button>
-        {error && <p>{error.message}</p>}
-      </StyledSignInForm>
+            <input
+              name="passwordTwo"
+              value={passwordTwo}
+              onChange={this.onChange}
+              type="password"
+              placeholder="Confirm Password"
+            />
+          </div>
+          <button disabled={isInvalid} type="submit">
+            Sign Up
+          </button>
+          {error && <p>{error.message}</p>}
+        </form>
+      </StyledSignUpDiv>
     );
   }
 }
