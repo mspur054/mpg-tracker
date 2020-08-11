@@ -11,12 +11,15 @@ export const StyledSignInForm = styled.form`
   }
 
   div > label {
-    flex: 1 0 280px;
+    flex: 1 0 100%;
     text-align: left;
   }
 
   div > label + * {
-    flex: 1 0 280px;
+    flex: 1 0 100%;
+  }
+  input {
+    box-sizing: border-box;
   }
 
   input {

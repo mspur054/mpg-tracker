@@ -42,12 +42,12 @@ export const StyledTrackingForm = styled.ul`
   input,
   select {
     border-radius: 3px;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     padding: 6px 12px;
   }
 
   input:focus {
-    border: 1px solid #00bfff;
+    border: 2px solid #00bfff;
   }
 
   select {
