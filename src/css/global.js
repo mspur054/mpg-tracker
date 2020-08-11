@@ -9,6 +9,7 @@ export const GlobalStyles = createGlobalStyle`
 
   #root {
     height: 100vh;
+    width: 100%;
   }
 
   // *, *::after, *::before {
@@ -59,6 +60,11 @@ export const GlobalStyles = createGlobalStyle`
   }
   body {
     height: 100%;
+  }
+
+  ul {
+    padding-inline-start: 0px;
+
   }
 
 
