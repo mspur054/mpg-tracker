@@ -1,6 +1,12 @@
 import { VictoryChart, VictoryLine, VictoryAxis, VictoryLabel } from "victory";
 import React, { useState, useEffect } from "react";
-import { addDays, subDays, format, startOfMonth } from "date-fns";
+import {
+  isSameDay,
+  format,
+  startOfMonth,
+  max,
+  eachMonthOfInterval,
+} from "date-fns";
 
 const LineGraph = ({ entries }) => {
   const [graphData, setGraphData] = useState({
@@ -11,24 +17,22 @@ const LineGraph = ({ entries }) => {
   useEffect(() => {
     if (entries) {
       let data = [];
-      // const firstDate = startOfMonth(
-      //   subDays(new Date(entries[0].entryDate), 30)
-      // );
-      // const lastDate = startOfMonth(
-      //   addDays(new Date(entries[entries.length - 1].entryDate), 30)
-      // );
+
       let xTickValues = [];
+      const firstDate = new Date(entries[0].entryDate);
+      const maxDate = max(entries.map((e) => new Date(e.entryDate)));
+      xTickValues = eachMonthOfInterval({ start: firstDate, end: maxDate });
 
       //TODO: from db only send last year of data
       entries.map((e) => {
         const entryDate = new Date(e.entryDate);
-        console.log(entryDate.Day);
+
         data.push({ x: entryDate, y: e.kmPerHundred });
-        xTickValues.push(startOfMonth(entryDate));
       });
-      // xTickValues.unshift(firstDate);
-      // xTickValues.push(lastDate);
-      //Remove duplicates ()
+      xTickValues.shift();
+      xTickValues.unshift(firstDate);
+
+      //Remove duplicates
       xTickValues = [...new Set(xTickValues.map((dt) => dt.toString()))];
       setGraphData({ data: data, styles: { xTickValues: xTickValues } });
     }
@@ -46,10 +50,13 @@ const LineGraph = ({ entries }) => {
         />
         <VictoryAxis
           label="Fuel up date"
-          tickValues={graphData.data.map((e) => new Date(e.x))}
-          tickFormat={(e) => format(new Date(e), "MMM d")}
-          //tickValues={graphData.styles.xTickValues.map((e) => new Date(e))}
-          // tickFormat={(tick) => format(new Date(tick), "MMM yy")}
+          tickValues={graphData.styles.xTickValues.map((e) => new Date(e))}
+          //only show first's of months
+          tickFormat={(tick) =>
+            isSameDay(new Date(tick), startOfMonth(new Date(tick)))
+              ? format(new Date(tick), "MMM d")
+              : ""
+          }
         />
         <VictoryLine
           padding={{ left: 60, right: 60 }}
