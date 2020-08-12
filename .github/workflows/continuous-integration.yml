@@ -6,11 +6,18 @@ jobs:
   buildAndTest:
     name: Build and Test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
     steps:
       - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
       - name: Build
-        run: npm build
-      - name: Test
-        run: npm test --watchAll=false
+        run: npm run build
+      # - name: Test
+      #   run: npm test
