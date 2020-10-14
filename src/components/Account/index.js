@@ -5,6 +5,7 @@ import { withFirebase } from "../Firebase";
 import { AuthUserContext, withAuthorization } from "../Session";
 import { PasswordForgetForm } from "../PasswordForget";
 import Spinner from "../Spinner";
+import TempSwitch from "../TempSwitch";
 
 const INITIAL_STATE = {
   user: null,
@@ -14,7 +15,7 @@ const INITIAL_STATE = {
 const AccountPage = ({ firebase }) => {
   const [state, setState] = useState(INITIAL_STATE);
   // ! Figure out how to use this instead of
-  const { authUser } = useContext(AuthUserContext);
+  const authUser = useContext(AuthUserContext);
 
   useEffect(() => {
     setState({ loading: true });
@@ -41,6 +42,34 @@ const AccountPage = ({ firebase }) => {
       }
     });
   }, [authUser]);
+
+  const updateUser = (user) => {
+    const ref = firebase.db.ref(`/users/${authUser.uid}`);
+    //TODO update mileage preference in multiple places...
+    //let updates = {}
+    //updates['summaryStats']
+
+    ref.update(user, function (error) {
+      if (error) {
+        // The write failed...
+        console.log("write failed");
+      } else {
+        console.log("worked");
+      }
+    });
+  };
+
+  const handleToggle = () => {
+    //TODO add code to update in firebase db
+    const newUserState = { ...state.user, isMetric: !state.user.isMetric };
+    setState(
+      {
+        user: newUserState,
+        loading: false,
+      },
+      updateUser(newUserState)
+    );
+  };
   const { user, loading } = state;
   return (
     <AuthUserContext.Consumer>
@@ -60,9 +89,18 @@ const AccountPage = ({ firebase }) => {
                 {user.username} <br />
                 {user.email}
               </p>
+              <div>
+                <h4>Select Units</h4>
+                <TempSwitch
+                  isOn={state.user.isMetric}
+                  handleToggle={handleToggle}
+                />
+              </div>
+
+              <h4>Edit password</h4>
+              <PasswordForgetForm email={user.email} />
             </>
           )}
-          <PasswordForgetForm />
         </div>
       )}
     </AuthUserContext.Consumer>

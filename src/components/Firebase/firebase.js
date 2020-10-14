@@ -144,6 +144,8 @@ class Firebase {
         totalCost: 0,
         totalLiters: 0,
         averageMPG: 0.0,
+        worstMPG: 0.0,
+        bestMPG: 0.0,
         lastMPG: 0.0,
         totalDistance: 0,
         dateLastFueledUp: null,
