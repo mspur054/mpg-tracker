@@ -1,11 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { compose } from "recompose";
-import {
-  VictoryChart,
-  VictoryAxis,
-  VictoryLine,
-  // VictoryTooltip
-} from "victory";
 
 import { withAuthorization, AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
@@ -18,9 +12,6 @@ import {
 
 import Spinner from "../Spinner";
 
-import Card from "../Card";
-import { useAuth } from "../../helper/helper";
-
 const INITIAL_STATE = {
   entries: null,
   loading: true,
@@ -28,71 +19,6 @@ const INITIAL_STATE = {
   totalSpent: null,
   avgEfficiency: null,
   chartData: null,
-};
-
-const CHART_INITIAL_STATE = {
-  //! FIX THIS
-  isLoading: true,
-  chartData: [],
-};
-
-const MpgChart = (entries) => {
-  const [state, setState] = useState(CHART_INITIAL_STATE);
-
-  const today = new Date();
-  const monthlyDomain = [today.getMonth() - 2, today.getMonth() + 1];
-
-  useEffect(() => {
-    try {
-      const monthlyData = summarizeData(entries);
-
-      setState({
-        isLoading: false,
-        chartData: monthlyData,
-      });
-    } catch (e) {
-      //sconsole.log(e);
-      setState({ isLoading: false });
-    }
-  }, [entries]);
-  //
-  const yDomain = [0, getUpperYDomain(state.chartData)];
-
-  return state.isLoading ? (
-    <VictoryChart>
-      <VictoryLine />
-    </VictoryChart>
-  ) : (
-    <VictoryChart style={{ parent: { maxWidth: "100%" } }}>
-      <VictoryLine
-        labels={({ datum }) => Math.round(datum.cost)}
-        data={state.chartData}
-        x="month"
-        y="cost"
-        // labelComponent={
-        //   <VictoryTooltip cornerRadius={2} dy={0} centerOffset={{ x: 25 }} />
-        // }
-      />
-      <VictoryAxis
-        crossAxis
-        tickFormat={(t) => `${Math.round(t)}`}
-        tickCount={monthlyDomain[1] - monthlyDomain[0]}
-        domain={{ x: monthlyDomain }}
-      />
-      <VictoryAxis dependentAxis domain={{ y: yDomain }} />
-    </VictoryChart>
-  );
-};
-
-const getUpperYDomain = (monthlyData) => {
-  const maxVal = Math.max.apply(
-    Math,
-    monthlyData.map(function (o) {
-      return o.cost;
-    })
-  );
-
-  return Math.ceil(maxVal / 100) * 100;
 };
 
 class HomePageBase extends React.Component {
@@ -192,36 +118,36 @@ const avgMPG = (entries) => {
   return avg;
 };
 
-const summarizeData = (entries) => {
-  //might bnot be necessary
-  entries.forEach((e) => (e.month = new Date(e.dateAdded).getMonth() + 1));
+// const summarizeData = (entries) => {
+//   //might bnot be necessary
+//   entries.forEach((e) => (e.month = new Date(e.dateAdded).getMonth() + 1));
 
-  //Fields to summarize
-  const keys = ["cost", "liters", "mileage"];
+//   //Fields to summarize
+//   const keys = ["cost", "liters", "mileage"];
 
-  const monthlyData = entries.reduce((acc, cur) => {
-    //keep count of records for averaging
-    if (acc.hasOwnProperty(cur.month) === false) {
-      acc[cur.month] = { records: 1 };
-    } else {
-      acc[cur.month].records += 1;
-    }
-    //loop through fields to summarize
-    keys.forEach((prop) => {
-      acc[cur.month].hasOwnProperty(prop)
-        ? (acc[cur.month][prop] += Number(cur[prop]))
-        : (acc[cur.month][prop] = Number(cur[prop]));
-    });
-    return acc;
-  }, {});
+//   const monthlyData = entries.reduce((acc, cur) => {
+//     //keep count of records for averaging
+//     if (acc.hasOwnProperty(cur.month) === false) {
+//       acc[cur.month] = { records: 1 };
+//     } else {
+//       acc[cur.month].records += 1;
+//     }
+//     //loop through fields to summarize
+//     keys.forEach((prop) => {
+//       acc[cur.month].hasOwnProperty(prop)
+//         ? (acc[cur.month][prop] += Number(cur[prop]))
+//         : (acc[cur.month][prop] = Number(cur[prop]));
+//     });
+//     return acc;
+//   }, {});
 
-  const graphData = Object.entries(monthlyData).map((e) => ({
-    month: parseInt(e[0], 10),
-    ...e[1],
-  }));
+//   const graphData = Object.entries(monthlyData).map((e) => ({
+//     month: parseInt(e[0], 10),
+//     ...e[1],
+//   }));
 
-  return graphData;
-};
+//   return graphData;
+// };
 
 const condition = (authUser) => !!authUser;
 
