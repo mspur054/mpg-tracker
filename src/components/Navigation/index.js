@@ -11,44 +11,46 @@ const Navigation = ({ open }) => {
   return (
     <StyledMenu open={open}>
       <AuthUserContext.Consumer>
-        {authUser => (authUser ? <NavigatonAuth /> : <NavigationNonAuth />)}
+        {(authUser) => (authUser ? <NavigatonAuth /> : <NavigationNonAuth />)}
       </AuthUserContext.Consumer>
     </StyledMenu>
   );
 };
 
-const NavigatonAuth = () => (
-  <ul className="main-nav">
-    <li>
-      <Link className="nav-links" to={ROUTES.HOME}>
-        Home
-      </Link>
-    </li>
-    <li>
-      <Link className="nav-links" to={ROUTES.ACCOUNT}>
-        Account
-      </Link>
-    </li>
-    <li>
-      <Link className="nav-links" to={ROUTES.ADMIN}>
-        Admin
-      </Link>
-    </li>
-    <li>
-      <Link className="nav-links" to={ROUTES.CARS}>
-        Cars
-      </Link>
-    </li>
-    <li>
-      <Link className="nav-links" to={ROUTES.DATA_ENTRY}>
-        Entries
-      </Link>
-    </li>
-    <li>
-      <SignOutButton />
-    </li>
-  </ul>
-);
+const NavigatonAuth = () => {
+  return (
+    <ul className="main-nav">
+      <li>
+        <Link className="nav-links" to={ROUTES.HOME}>
+          Home
+        </Link>
+      </li>
+      <li>
+        <Link className="nav-links" to={ROUTES.ACCOUNT}>
+          Account
+        </Link>
+      </li>
+      <li>
+        <Link className="nav-links" to={ROUTES.ADMIN}>
+          Admin
+        </Link>
+      </li>
+      <li>
+        <Link className="nav-links" to={ROUTES.CARS}>
+          Cars
+        </Link>
+      </li>
+      <li>
+        <Link className="nav-links" to={ROUTES.DATA_ENTRY}>
+          Entries
+        </Link>
+      </li>
+      <li>
+        <SignOutButton />
+      </li>
+    </ul>
+  );
+};
 
 const NavigationNonAuth = () => (
   <ul className="main-nav">
