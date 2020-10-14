@@ -9,7 +9,7 @@ describe("BAN Testing", () => {
   let wrapper;
 
   beforeEach(() => {
-    wrapper = shallow(<BANList />);
+    wrapper = shallow(<GraphContainer />);
   });
 
   test("render the total spent BAN to be N/A", () => {

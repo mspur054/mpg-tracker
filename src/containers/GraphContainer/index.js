@@ -12,13 +12,16 @@ const GraphContainer = (props) => {
   return (
     <StyledGridContainer>
       <StyledBAN className="ban-spent">
-        {props.totalCost ? `$${props.totalCost}` : "N/A"}
-        <StyledLabel>Spent</StyledLabel>
+        {props.totalCost
+          ? `$${props.totalCost}` + <StyledLabel>Spent</StyledLabel>
+          : "N/A"}
       </StyledBAN>
       <StyledBAN className="ban-mpg">
         {/* !TODO add KM / Miles */}
-        {props.averageMetricMPG ? props.averageMetricMPG.toFixed(2) : "N/A"}
-        <StyledLabel>L/100 KM</StyledLabel>
+        {props.averageMetricMPG
+          ? props.averageMetricMPG.toFixed(2) +
+            <StyledLabel>L/100 KM</StyledLabel>
+          : "N/A"}
       </StyledBAN>
       <StyledBAN className="ban-distance">
         {/* !TODO add KM / Miles */}
