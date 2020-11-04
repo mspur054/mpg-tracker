@@ -1,5 +1,4 @@
 import React from "react";
-import { compose } from "recompose";
 
 import { withFirebase } from "../Firebase";
 

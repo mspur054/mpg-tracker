@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import { compose } from "recompose";
 import { withRouter } from "react-router-dom";
 
-import { AuthUserContext } from "../Session";
+import { AuthUserContext, withUnits, UnitContext } from "../Session";
 import { withFirebase } from "../Firebase";
 
 import {
@@ -13,6 +13,7 @@ import {
 
 import * as ROUTES from "../../constants/routes";
 import "react-datepicker/dist/react-datepicker.css";
+import { milesToKMeters, gallonsToLiters } from "../../helper/efficency";
 
 const INITIAL_STATE = {
   selectedCar: { label: null, value: null },
@@ -76,8 +77,17 @@ class TrackingFormBase extends React.Component {
     this.setState({ selectedCar: car });
   };
 
-  onSubmit = (event, authUser) => {
-    const { selectedCar, mileage, liters, entryDate, cost } = this.state;
+  onSubmit = (event, authUser, isMetric) => {
+    const { selectedCar, entryDate, cost } = this.state;
+    let { mileage, liters } = this.state;
+
+    //convert to metric before storing in db
+    if (!isMetric) {
+      //convert mileage (miles) to kilometers
+      mileage = milesToKMeters(mileage);
+      //convert gallons to liters
+      liters = gallonsToLiters(liters);
+    }
 
     this.props.firebase
       .doCreateGasEntry(
@@ -111,7 +121,7 @@ class TrackingFormBase extends React.Component {
       error,
       loading,
       cost,
-      selectedCar,
+
       cars,
     } = this.state;
     const isInvalid = mileage === "" || liters === "" || entryDate === "";
@@ -119,96 +129,111 @@ class TrackingFormBase extends React.Component {
     return (
       <AuthUserContext.Consumer>
         {(authUser) => (
-          <>
-            <h1>Add a Fuel Up</h1>
-            <form
-              autoComplete="off"
-              onSubmit={(event) => this.onSubmit(event, authUser)}
-            >
-              <StyledTrackingForm>
-                {loading && <div>Loading...</div>}
+          <UnitContext.Consumer>
+            {(userSettings) => (
+              <>
+                <h1>Add a Fuel Up</h1>
+                <form
+                  autoComplete="off"
+                  onSubmit={(event) =>
+                    this.onSubmit(event, authUser, userSettings.isMetric)
+                  }
+                >
+                  <StyledTrackingForm>
+                    {loading && <div>Loading...</div>}
 
-                <li>
-                  <label>Vehicle</label>
-                  {!loading && (
-                    <select
-                      required
-                      onChange={(event) =>
-                        this.setState({
-                          selectedCar: { value: event.target.value },
-                        })
-                      }
-                      value={this.state.selectedCar.value || ""}
-                    >
-                      {cars.map((car) => {
-                        return (
-                          <option key={car.uid} value={car.uid}>
-                            {car.carname}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  )}
-                </li>
-                <li>
-                  <label htmlFor="mileage">Kilometers since last refill</label>
-                  <input
-                    name="mileage"
-                    value={mileage}
-                    onChange={this.onChange}
-                    type="number"
-                    placeholder="Distance travelled"
-                    step=".01"
-                    min="0"
-                    required
-                  />
-                </li>
-                <li>
-                  <label htmlFor="liters">Gas Consumed</label>
-                  <input
-                    required
-                    name="liters"
-                    value={liters}
-                    onChange={this.onChange}
-                    type="number"
-                    placeholder="Gas consumed"
-                  />
-                </li>
-                <li>
-                  <label htmlFor="cost">Total Cost</label>
-                  <input
-                    name="cost"
-                    value={cost}
-                    onChange={this.onChange}
-                    type="number"
-                    placeholder="Cost of refill"
-                    step=".01"
-                    min="0"
-                  />
-                </li>
-                <li>
-                  <label htmlFor="entryDate">Date of Refill</label>
-                  <DatePicker
-                    name="entryDate"
-                    selected={entryDate}
-                    maxDate={new Date()}
-                    onChange={(date) => this.setState({ entryDate: date })}
-                    required
-                  ></DatePicker>
-                </li>
-                <li>
-                  <StyledTrackingFormButton disabled={isInvalid} type="submit">
-                    Save
-                  </StyledTrackingFormButton>
-                </li>
-                {error && <p>{error.message}</p>}
-              </StyledTrackingForm>
-            </form>
-          </>
+                    <li>
+                      <label>Vehicle</label>
+                      {!loading && (
+                        <select
+                          required
+                          onChange={(event) =>
+                            this.setState({
+                              selectedCar: { value: event.target.value },
+                            })
+                          }
+                          value={this.state.selectedCar.value || ""}
+                        >
+                          {cars.map((car) => {
+                            return (
+                              <option key={car.uid} value={car.uid}>
+                                {car.carname}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      )}
+                    </li>
+                    <li>
+                      <label htmlFor="mileage">
+                        {`${userSettings.isMetric ? "Kilometers" : "Miles"}`}{" "}
+                        since last refill
+                      </label>
+                      <input
+                        name="mileage"
+                        value={mileage}
+                        onChange={this.onChange}
+                        type="number"
+                        placeholder="Distance travelled"
+                        step=".01"
+                        min="0"
+                        required
+                      />
+                    </li>
+                    <li>
+                      <label htmlFor="liters">
+                        Gas Consumed{" "}
+                        {`${userSettings.isMetric ? "(L)" : "(Gal)"}`}
+                      </label>
+                      <input
+                        required
+                        name="liters"
+                        value={liters}
+                        onChange={this.onChange}
+                        type="number"
+                        placeholder="Gas consumed"
+                      />
+                    </li>
+                    <li>
+                      <label htmlFor="cost">Total Cost</label>
+                      <input
+                        name="cost"
+                        value={cost}
+                        onChange={this.onChange}
+                        type="number"
+                        placeholder="Cost of refill"
+                        step=".01"
+                        min="0"
+                      />
+                    </li>
+                    <li>
+                      <label htmlFor="entryDate">Date of Refill</label>
+                      <DatePicker
+                        name="entryDate"
+                        selected={entryDate}
+                        maxDate={new Date()}
+                        onChange={(date) => this.setState({ entryDate: date })}
+                        required
+                      ></DatePicker>
+                    </li>
+                    <li>
+                      <StyledTrackingFormButton
+                        disabled={isInvalid}
+                        type="submit"
+                      >
+                        Save
+                      </StyledTrackingFormButton>
+                    </li>
+                    {error && <p>{error.message}</p>}
+                  </StyledTrackingForm>
+                </form>
+              </>
+            )}
+          </UnitContext.Consumer>
         )}
       </AuthUserContext.Consumer>
     );
   }
 }
 
-export default compose(withFirebase, withRouter)(TrackingFormBase);
+export default compose(withFirebase, withRouter, withUnits)(TrackingFormBase);
