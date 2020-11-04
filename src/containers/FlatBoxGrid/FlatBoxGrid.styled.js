@@ -1,21 +1,26 @@
 import styled from "styled-components";
 
 export const StyledGrid = styled.div`
-  @media (min-width: 970px) {
-    grid-template-columns: repeat(3, 1fr);
-    -webkit-box-pack: center;
-    justify-content: center;
-    padding-left: 45px;
-    padding-right: 45px;
-  }
+  max-width: 100%;
+  display: grid;
+  background-color: red;
+  grid-gap: 2rem;
+  grid-template-columns: 1fr;
 
-  @media (min-width: 750px) {
-    display: grid;
-    grid-column-gap: 30px;
-    grid-row-gap: 30px;
-  }
-
-  padding-right: 24px;
-  padding-left: 24px;
   margin: 0 auto;
+  justify-content: center;
+  -webkit-box-pack: center;
+  position: relative;
+
+  @media (min-width: 400px) {
+    background-color: purple;
+    grid-template-columns: 1fr;
+  }
+
+  @media screen and (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 1rem;
+
+    background-color: lightgreen;
+  }
 `;
