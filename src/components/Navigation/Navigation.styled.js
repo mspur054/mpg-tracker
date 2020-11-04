@@ -43,3 +43,15 @@ export const StyledMenu = styled.nav`
     }
   }
 `;
+
+export const StyledUnitContainer = styled.div``;
+
+export const StyledUnitTitle = styled.p`
+  font-size: 1rem;
+  text-transform: uppercase;
+  padding: 1rem 0;
+  font-weight: bold;
+  letter-spacing: 0.25rem;
+  color: ${({ theme }) => theme.primaryDark};
+  text-decoration: none;
+`;

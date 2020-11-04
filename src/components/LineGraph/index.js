@@ -24,10 +24,11 @@ const LineGraph = ({ entries }) => {
       xTickValues = eachMonthOfInterval({ start: firstDate, end: maxDate });
 
       //TODO: from db only send last year of data
-      entries.map((e) => {
+      data = entries.map((e) => {
         const entryDate = new Date(e.entryDate);
 
-        data.push({ x: entryDate, y: e.kmPerHundred });
+        //data.push({ x: entryDate, y: e.kmPerHundred });
+        return { x: entryDate, y: e.kmPerHundred };
       });
       xTickValues.shift();
       xTickValues.unshift(firstDate);
@@ -39,35 +40,32 @@ const LineGraph = ({ entries }) => {
   }, [entries]);
 
   return (
-    <div>
-      <VictoryChart scale={{ x: "time" }} domainPadding={30} width={400}>
-        <VictoryLabel text="MPG" x={200} y={30} textAnchor="middle" />
-        <VictoryAxis
-          dependentAxis={true}
-          style={{
-            grid: { stroke: "grey" },
-          }}
-        />
-        <VictoryAxis
-          label="Fuel up date"
-          tickValues={graphData.styles.xTickValues.map((e) => new Date(e))}
-          //only show first's of months
-          tickFormat={(tick) =>
-            isSameDay(new Date(tick), startOfMonth(new Date(tick)))
-              ? format(new Date(tick), "MMM d")
-              : ""
-          }
-        />
-        <VictoryLine
-          padding={{ left: 60, right: 60 }}
-          style={{
-            data: { stroke: "#c43a31" },
-            parent: { border: "1px solid #ccc" },
-          }}
-          data={graphData.data}
-        />
-      </VictoryChart>
-    </div>
+    <VictoryChart scale={{ x: "time" }} domainPadding={30} width={400}>
+      <VictoryLabel text="MPG" x={200} y={30} textAnchor="middle" />
+      <VictoryAxis
+        dependentAxis={true}
+        style={{
+          grid: { stroke: "grey" },
+        }}
+      />
+      <VictoryAxis
+        tickValues={graphData.styles.xTickValues.map((e) => new Date(e))}
+        //only show first's of months
+        tickFormat={(tick) =>
+          isSameDay(new Date(tick), startOfMonth(new Date(tick)))
+            ? format(new Date(tick), "MMM d")
+            : ""
+        }
+      />
+      <VictoryLine
+        padding={{ left: 60, right: 60 }}
+        style={{
+          data: { stroke: "#c43a31" },
+          parent: { border: "1px solid #ccc" },
+        }}
+        data={graphData.data}
+      />
+    </VictoryChart>
   );
 };
 
