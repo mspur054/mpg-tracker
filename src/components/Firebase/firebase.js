@@ -123,6 +123,7 @@ class Firebase {
         updates[`${entrySnapshot.key}/kmPerHundred`] =
           (entry.liters / entry.mileage) * 100;
       });
+      console.log(result);
       ref.update(updates);
     });
   };
@@ -187,13 +188,8 @@ class Firebase {
 
         return entriesList;
       }
-
-      // const carData = this.db.ref(`cars/${carId}`).update({
-      //   data:{
-      //     1
-      //   }
-      // })
     });
+    console.log(listener);
     return this.db
       .ref(`cars/${userId}/${carId}`)
       .update({ summarizedEntries: data })
@@ -207,7 +203,5 @@ class Firebase {
       });
   };
 }
-
-//export default !firebase.apps.length ? firebase.initializeApp(config) : firebase.app();
 
 export default Firebase;
