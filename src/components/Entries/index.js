@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { compose } from "recompose";
 import { useTable, useSortBy } from "react-table";
 import { Link } from "react-router-dom";
 
 import { withFirebase } from "../Firebase";
-import { AuthUserContext, withAuthorization } from "../Session";
+import {
+  AuthUserContext,
+  withAuthorization,
+  UnitContext,
+  withUnits,
+} from "../Session";
 import { DATA_ENTRY } from "../../constants/routes";
 import { formatDate } from "../../helper/helper";
+import { kilometersToMiles, litersToGallons } from "../../helper/efficency";
 
 import { StyledEntryContainer } from "./Entries.styled";
 
@@ -18,6 +24,8 @@ const Entries = ({ match, location, ...props }) => {
     entries: null,
     test: null,
   });
+
+  const { isMetric } = useContext(UnitContext);
 
   useEffect(() => {
     const ref = props.firebase.db
@@ -33,9 +41,9 @@ const Entries = ({ match, location, ...props }) => {
           uid: key,
         }));
         // ! TODO: move this to firebase class
-        const test = props.firebase.doSummarizeCarData(userId, carId);
+        //const test = props.firebase.doSummarizeCarData(userId, carId);
 
-        setState({ loading: false, entries: entriesList, test: test });
+        setState({ loading: false, entries: entriesList });
       } else {
         setState({ loading: false });
       }
@@ -44,8 +52,8 @@ const Entries = ({ match, location, ...props }) => {
     return () => ref.off("value", listener);
   }, [props.firebase.db, carId, userId]);
 
-  const columns = React.useMemo(
-    () => [
+  const getColumns = (isMetric) => {
+    return [
       {
         Header: "Entry",
         columns: [
@@ -56,42 +64,55 @@ const Entries = ({ match, location, ...props }) => {
             },
           },
           {
-            Header: "Liters",
-            accessor: "liters",
+            Header: isMetric ? "Liters" : "Gallons",
+            accessor: isMetric
+              ? "liters"
+              : (d) => {
+                  return litersToGallons(d.liters).toFixed(2);
+                },
           },
           {
             Header: "Cost",
             accessor: "cost",
           },
           {
-            Header: "Mileage",
-            accessor: "mileage",
+            Header: isMetric ? "Mileage (Km)" : "Miles",
+            accessor: isMetric
+              ? "mileage"
+              : (d) => {
+                  return kilometersToMiles(d.mileage).toFixed(0);
+                },
           },
         ],
       },
-    ],
-    []
-  );
+    ];
+  };
+
+  const columns = React.useMemo(() => getColumns(isMetric), [isMetric]);
 
   return (
     <AuthUserContext.Consumer>
       {(authUser) => (
-        <div>
-          <h1>{`Entries for ${carname}`}</h1>
+        <UnitContext.Consumer>
+          {(userSettings) => (
+            <div>
+              <h1>{`Entries for ${carname}`}</h1>
 
-          {!state.loading && state.entries && (
-            <StyledEntryContainer>
-              <Table columns={columns} data={state.entries} />
-            </StyledEntryContainer>
+              {!state.loading && state.entries && (
+                <StyledEntryContainer>
+                  <Table columns={columns} data={state.entries} />
+                </StyledEntryContainer>
+              )}
+              {!state.loading && state.entries == null && (
+                <StyledEntryContainer>
+                  <p>
+                    No entries yet, <Link to={`${DATA_ENTRY}`}>add one</Link>
+                  </p>
+                </StyledEntryContainer>
+              )}
+            </div>
           )}
-          {!state.loading && state.entries == null && (
-            <StyledEntryContainer>
-              <p>
-                No entries yet, <Link to={`${DATA_ENTRY}`}>add one</Link>
-              </p>
-            </StyledEntryContainer>
-          )}
-        </div>
+        </UnitContext.Consumer>
       )}
     </AuthUserContext.Consumer>
   );
@@ -163,4 +184,8 @@ function Table({ columns, data }) {
 
 const condition = (authUser) => !!authUser;
 
-export default compose(withFirebase, withAuthorization(condition))(Entries);
+export default compose(
+  withFirebase,
+  withAuthorization(condition),
+  withUnits
+)(Entries);
