@@ -13,6 +13,7 @@ export const StyledRow = styled.div`
   flex-wrap: wrap;
   margin-right: -15px;
   margin-left: -15px;
+  justify-content: center;
 `;
 
 export const StyledHeading = styled.div`
