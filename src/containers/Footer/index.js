@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 import { StyledFooter } from "./Footer.styled";
 
@@ -8,7 +7,14 @@ const Footer = () => {
     <StyledFooter>
       <div>
         <p>
-          Made with ❤ by <Link>Matt Spurdle</Link>
+          Made with ❤ by{" "}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/mspur054/"
+          >
+            Matt Spurdle
+          </a>
         </p>
       </div>
     </StyledFooter>
