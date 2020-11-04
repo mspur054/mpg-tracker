@@ -23,7 +23,7 @@ export const StyledMain = styled.main`
   flex: 1 0 auto;
   position: relative;
   min-width: 1px;
-  max-width: 600px;
+  max-width: 700px;
   margin: 0 auto;
   z-index: 1;
 `;
