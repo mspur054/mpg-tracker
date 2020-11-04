@@ -1,19 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { compose } from "recompose";
 
 import { ENTRIES } from "../../constants/routes";
 import { withFirebase } from "../Firebase";
 import { Link } from "react-router-dom";
-import LineGraph from "../LineGraph";
+import { withUnits, UnitContext, withAuthorization } from "../Session";
 
-import { withAuthorization } from "../Session";
+import GraphContainer from "../../containers/GraphContainer";
 
 const Car = (props) => {
   const { carname, dateAdded, year, uid, userId } = props.location.state;
 
-  const [state, setState] = useState({ loading: true, entries: null });
+  const { isMetric } = useContext(UnitContext);
+
+  const [state, setState] = useState({
+    loading: true,
+    entries: null,
+    summaryData: null,
+  });
 
   useEffect(() => {
+    let entries;
     const ref = props.firebase.db
       .ref(`gasEntries/${userId}`)
       .orderByChild("carId")
@@ -25,16 +32,35 @@ const Car = (props) => {
           ...carObject[key],
           uid: key,
         }));
-        setState({ loading: false, entries: carList });
+        //setState({ entries: carList });
+        entries = carList;
       }
     });
+    console.log(entries);
+
+    const summaryRef = props.firebase.db.ref(`summaryStats/${uid}`);
+    console.log(uid);
+    summaryRef.on("value", (snapshot) => {
+      const summaryObj = snapshot.val();
+      console.log(summaryObj);
+      if (summaryObj) {
+        setState({
+          entries: entries,
+          loading: false,
+          summaryData: summaryObj,
+        });
+      }
+    });
+
     return () => ref.off("value", listener);
   }, [props.firebase.db, userId, uid]);
 
   const numEntries = state.entries ? (
-    <div>
-      <LineGraph entries={state.entries} />
-    </div>
+    <GraphContainer
+      entries={state.entries}
+      isMetric={isMetric}
+      {...state.summaryData}
+    />
   ) : (
     <div>no entries yet</div>
   );
@@ -66,5 +92,8 @@ const Car = (props) => {
 
 const condition = (authUser) => !!authUser;
 
-export default withFirebase(Car);
-//export default compose(withFirebase, withAuthorization(condition))(Car);
+export default compose(
+  withFirebase,
+  withUnits,
+  withAuthorization(condition)
+)(Car);
