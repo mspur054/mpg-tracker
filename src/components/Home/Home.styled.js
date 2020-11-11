@@ -24,3 +24,7 @@ export const StyledInformationContainer = styled.div`
   border: 10px solid mistyrose;
   height: 60vh;
 `;
+
+export const StyledButtonDiv = styled.div`
+  margin-top: 2rem;
+`;

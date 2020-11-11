@@ -1,6 +1,8 @@
 import React from "react";
 import { compose } from "recompose";
+import { Link } from "react-router-dom";
 
+import * as ROUTES from "../../constants/routes";
 import { withAuthorization, AuthUserContext } from "../Session";
 import { withFirebase } from "../Firebase";
 import {
@@ -8,6 +10,7 @@ import {
   StyledInformationContainer,
   StyledSpentOnGas,
   StyledMPG,
+  StyledButtonDiv,
 } from "./Home.styled";
 
 import Spinner from "../Spinner";
@@ -95,6 +98,11 @@ class HomePageBase extends React.Component {
             )}
 
             {/* {!cars && <div>There are no cars...</div>} */}
+            <StyledButtonDiv>
+              <Link to={ROUTES.DATA_ENTRY}>
+                <button>Add an entry</button>
+              </Link>
+            </StyledButtonDiv>
           </div>
         )}
       </AuthUserContext.Consumer>
