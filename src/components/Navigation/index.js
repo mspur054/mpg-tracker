@@ -30,11 +30,11 @@ const NavigatonAuth = () => {
           Account
         </Link>
       </li>
-      <li>
+      {/* <li>
         <Link className="nav-links" to={ROUTES.ADMIN}>
           Admin
         </Link>
-      </li>
+      </li> */}
       <li>
         <Link className="nav-links" to={ROUTES.CARS}>
           Cars
