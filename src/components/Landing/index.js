@@ -1,5 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
+import * as ROUTES from "../../constants/routes";
 import FlatBox from "../../containers/FlatBox";
 import FlatBoxGrid from "../../containers/FlatBoxGrid";
 //TODO
@@ -17,7 +19,9 @@ const LandingPage = () => {
           Fuellage is a web app for tracking your vehicle's efficiency. Gain
           insight into how well your car is running.
         </h3>
-        <button>Get Started</button>
+        <Link to={ROUTES.SIGN_UP}>
+          <button>Get Started</button>
+        </Link>
       </div>
       <FlatBoxGrid>
         <FlatBox heading={"Track"} desc={"hello"} />
