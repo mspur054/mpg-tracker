@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const StyledGrid = styled.div`
   max-width: 100%;
   display: grid;
-  background-color: red;
+
   grid-gap: 2rem;
   grid-template-columns: 1fr;
 
@@ -13,7 +13,7 @@ export const StyledGrid = styled.div`
   position: relative;
 
   @media (min-width: 400px) {
-    background-color: purple;
+    // background-color: purple;
     grid-template-columns: 1fr;
   }
 
@@ -21,6 +21,6 @@ export const StyledGrid = styled.div`
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 1rem;
 
-    background-color: lightgreen;
+    // background-color: lightgreen;
   }
 `;
